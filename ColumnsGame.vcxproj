@@ -77,6 +77,24 @@
       <EntryPointSymbol>
       </EntryPointSymbol>
     </Link>
+    <PostBuildEvent>
+      <Command>if exist "$(OutputPath)blocks.bmp" (
+    del "$(OutputPath)blocks.bmp"
+)
+
+if exist "$(OutputPath)fonts.bmp" (
+    del "$(OutputPath)fonts.bmp"
+)
+
+if exist "$(OutputPath)SDL2.dll" (
+    del "$(OutputPath)SDL2.dll"
+)
+
+xcopy "$(MSBuildProjectDirectory)\resources\blocks.bmp" "$(OutputPath)"
+xcopy "$(MSBuildProjectDirectory)\resources\fonts.bmp" "$(OutputPath)"
+xcopy "$(MSBuildProjectDirectory)\resources\SDL2.dll" "$(OutputPath)"
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">
     <ClCompile>

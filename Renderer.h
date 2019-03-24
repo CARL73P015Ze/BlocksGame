@@ -22,7 +22,7 @@ private:
 	SDL_Renderer* _Renderer;
 	FontSettings _DefaultFontSettings;
 	SDL_Texture* _DefaultFontTexture;
-
+	char* _data_path;
 	SDL_Rect _Source;
 	SDL_Rect _Dest;
 
@@ -56,7 +56,7 @@ private:
 	}
 
 public:
-	CRenderer(SDL_Renderer *renderer, FontSettings settings);
+	CRenderer(SDL_Renderer *renderer, FontSettings settings, char* data_path);
 	~CRenderer(void);
 
 	std::map<std::string, SDL_Texture*> _Textures;
@@ -78,12 +78,13 @@ public:
 	// this is in the wrong place i think
 	SDL_Texture* TryLoadImage(std::string file){
 		SDL_Surface *bmp = nullptr;
-		// TODO  fix me!
-		std::string relativepath = "C:\\development\\game\\BlocksGame\\Debug\\";
-		std::string temp = relativepath + file;
+
+		std::string temp = _data_path;
+		//temp.append("\\resources\\");
+		temp.append(file);
 		bmp = SDL_LoadBMP(temp.c_str());
 		if (bmp == nullptr){
-			printf("%s", SDL_GetError()); /// ewwwergh
+			printf("%s", SDL_GetError());
 			return nullptr;
 		}
 		SDL_Texture* out = SDL_CreateTextureFromSurface(_Renderer, bmp);

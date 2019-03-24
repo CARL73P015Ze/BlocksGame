@@ -40,12 +40,26 @@ const int SCREEN_WIDTH = 1280;//640;
 const int SCREEN_HEIGHT = 960;//480;
 const char GAME_NAME[] = "Blocks";
 
+
+char* data_path = NULL;
+void InitializeDataPath() {
+    char *base_path = SDL_GetBasePath();
+    if (base_path) {
+        data_path = base_path;
+    } else {
+        data_path = SDL_strdup("./");
+    }
+}
+
+
+
 int main2(  )
 {
     if (SDL_Init(SDL_INIT_EVERYTHING) == -1){
 		printf("%s", SDL_GetError());
         return 1;
     }
+
 
 	SDL_Window *win = nullptr;
     win = SDL_CreateWindow(GAME_NAME, 100, 100, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
@@ -71,8 +85,8 @@ int main2(  )
 	_FontSettings.width = 10;
 	_FontSettings.textureFileName = "fonts.bmp";
 
-
-	CRenderer renderer(ren, _FontSettings);
+	InitializeDataPath();
+	CRenderer renderer(ren, _FontSettings, data_path);
 
 
 
