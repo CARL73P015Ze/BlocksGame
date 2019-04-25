@@ -85,18 +85,7 @@ int CAIPlayer::GetTargetRotation(){
 }
 
 int CAIPlayer::CalculateVerticalRanking(const Block* block){
-	int rank = 1;
-				
-	if(block->GetDown() != NULL &&
-		block->GetDown()->type == this->Blocks.bottom){
-		rank++;
-		// ok we found a possible match
-		if(block->GetDown()->GetDown() != NULL &&
-			block->GetDown()->GetDown()->type == this->Blocks.bottom){
-			rank++;
-		}
-	}
-		
+	int rank = Calculate(block, this->Blocks.bottom, DOWN);	
 	if(Blocks.middle == Blocks.bottom){
 		rank++;
 	}
@@ -114,12 +103,12 @@ ColRanking CAIPlayer::CalculateHorizontalRanking(const Block* block){
 	r = CalculateHorizontalRanking(block, this->Blocks.bottom);
 	AssignRanking(rank, r);
 
-	const Block* up1 = block->GetUp();
+	const Block* up1 = block->connected[UP];
 	if(up1 != NULL){
-		r = CalculateHorizontalRanking(block->GetUp(), this->Blocks.middle);
+		r = CalculateHorizontalRanking(block->connected[UP], this->Blocks.middle);
 		AssignRanking(rank, r);
 
-		const Block* up2 = up1->GetUp();
+		const Block* up2 = up1->connected[UP];
 		if(up2 != NULL){
 			r = CalculateHorizontalRanking(up2, Blocks.top);
 			AssignRanking(rank, r);
@@ -137,28 +126,9 @@ void CAIPlayer::AssignRanking(ColRanking& rank, int ranking){
 }
 
 int CAIPlayer::CalculateHorizontalRanking(const Block* block, BlockType& type){
-	int hrank = 1;
-	if(block->GetRight() != NULL &&
-		block->GetRight()->type == type){
-		hrank++;
-		// ok we found a possible match
-		if(block->GetRight()->GetRight() != NULL &&
-			block->GetRight()->GetRight()->type == type){
-			hrank++;
-		}
-	}
-	if(block->GetLeft() != NULL &&
-		block->GetLeft()->type == type){
-		hrank++;
-
-		if(block->GetLeft()->GetLeft() != NULL &&
-			block->GetLeft()->GetLeft()->type == type){
-			hrank++;
-		}
-	}
-
-	return hrank;
+	return Calculate(block, type, RIGHT) + Calculate(block, type, LEFT) + 1;
 }
+
 
 ColRanking CAIPlayer::CalculateDiagUpRight(const Block* block){
 	ColRanking rank = {0, 0, 0};
@@ -167,12 +137,12 @@ ColRanking CAIPlayer::CalculateDiagUpRight(const Block* block){
 	r = CalculateDiagUpRight(block, this->Blocks.bottom);
 	AssignRanking(rank, r);
 
-	const Block* up1 = block->GetUp();
+	const Block* up1 = block->connected[UP];
 	if(up1 != NULL){
-		r = CalculateDiagUpRight(block->GetUp(), this->Blocks.middle);
+		r = CalculateDiagUpRight(block->connected[UP], this->Blocks.middle);
 		AssignRanking(rank, r);
 
-		const Block* up2 = up1->GetUp();
+		const Block* up2 = up1->connected[UP];
 		if(up2 != NULL){
 			r = CalculateDiagUpRight(up2, Blocks.top);
 			AssignRanking(rank, r);
@@ -183,26 +153,7 @@ ColRanking CAIPlayer::CalculateDiagUpRight(const Block* block){
 }
 
 int CAIPlayer::CalculateDiagUpRight(const Block* block, BlockType& type){
-	int durank = 1;
-	if(block->GetDiagUpRight() != NULL &&
-		block->GetDiagUpRight()->type == this->Blocks.bottom){
-		durank++;
-		// ok we found a possible match
-		if(block->GetDiagUpRight()->GetDiagUpRight() != NULL &&
-			block->GetDiagUpRight()->GetDiagUpRight()->type == this->Blocks.bottom){
-			durank++;
-		}
-	}
-	if(block->GetDiagDownLeft() != NULL &&
-		block->GetDiagDownLeft()->type == this->Blocks.bottom){
-		durank++;
-
-		if(block->GetDiagDownLeft()->GetDiagDownLeft() != NULL &&
-			block->GetDiagDownLeft()->GetDiagDownLeft()->type == this->Blocks.bottom){
-			durank++;
-		}
-	}
-	return durank;
+	return Calculate(block, type, UP_RIGHT) + Calculate(block, type, DOWN_LEFT) + 1;
 }
 
 
@@ -213,12 +164,12 @@ ColRanking CAIPlayer::CalculateDiagDownRight(const Block* block){
 	r = CalculateDiagDownRight(block, this->Blocks.bottom);
 	AssignRanking(rank, r);
 
-	const Block* up1 = block->GetUp();
+	const Block* up1 = block->connected[UP];
 	if(up1 != NULL){
-		r = CalculateDiagDownRight(block->GetUp(), this->Blocks.middle);
+		r = CalculateDiagDownRight(block->connected[UP], this->Blocks.middle);
 		AssignRanking(rank, r);
 
-		const Block* up2 = up1->GetUp();
+		const Block* up2 = up1->connected[UP];
 		if(up2 != NULL){
 			r = CalculateDiagDownRight(up2, Blocks.top);
 			AssignRanking(rank, r);
@@ -228,27 +179,23 @@ ColRanking CAIPlayer::CalculateDiagDownRight(const Block* block){
 	return rank;
 }
 
-int CAIPlayer::CalculateDiagDownRight(const Block* block, BlockType& type){
+int CAIPlayer::Calculate(const Block* block, BlockType& type, int direction){
 	int ddrank = 1;
-	if(block->GetDiagDownRight() != NULL &&
-		block->GetDiagDownRight()->type == this->Blocks.bottom){
+	if(block->connected[direction] != NULL &&
+		block->connected[direction]->type == this->Blocks.bottom){
 		ddrank++;
 		// ok we found a possible match
-		if(block->GetDiagDownRight()->GetDiagDownRight() != NULL &&
-			block->GetDiagDownRight()->GetDiagDownRight()->type == this->Blocks.bottom){
+		if(block->connected[direction]->connected[direction] != NULL &&
+			block->connected[direction]->connected[direction]->type == this->Blocks.bottom){
 			ddrank++;
 		}
 	}
-	if(block->GetDiagUpLeft() != NULL &&
-		block->GetDiagUpLeft()->type == this->Blocks.bottom){
-		ddrank++;
 
-		if(block->GetDiagUpLeft()->GetDiagUpLeft() != NULL &&
-			block->GetDiagUpLeft()->GetDiagUpLeft()->type == this->Blocks.bottom){
-			ddrank++;
-		}
-	}
 	return ddrank;
+}
+
+int CAIPlayer::CalculateDiagDownRight(const Block* block, BlockType& type){
+	return Calculate(block, type, DOWN_RIGHT) + Calculate(block, type, UP_LEFT) - 1;
 }
 
 ColRanking CAIPlayer::CalculateColumnRating(int col, const Board* board){
@@ -264,29 +211,26 @@ ColRanking CAIPlayer::CalculateColumnRating(int col, const Board* board){
 		if(block->type == EMPTY){
 			AssignRanking(verticalRank, CalculateVerticalRanking(block));
 			horizontalRank = CalculateHorizontalRanking(block);
-
 			diagUpRightRank = CalculateDiagUpRight(block);
 			diagDownRightRank = CalculateDiagDownRight(block);
 			break;
 		}
 	}
+
 	ColRanking result;
 	result.fullRanking = 0;
 	result.partialRanking = 0;
 
+
+
 	result.fullRanking += verticalRank.fullRanking;
+	result.fullRanking += horizontalRank.fullRanking;
+	result.fullRanking += diagUpRightRank.fullRanking;
+	result.fullRanking += diagDownRightRank.fullRanking;
 
 	result.partialRanking += verticalRank.partialRanking;
-
-
-	result.fullRanking += horizontalRank.fullRanking;
 	result.partialRanking += horizontalRank.partialRanking;
-
-	result.fullRanking += diagUpRightRank.fullRanking;
-
 	result.partialRanking += diagUpRightRank.partialRanking;
-
-	result.fullRanking += diagDownRightRank.fullRanking;
 	result.partialRanking += diagDownRightRank.partialRanking;
 
 	return result;

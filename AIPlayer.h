@@ -48,5 +48,8 @@ public:
 
 	ColRanking CalculateColumnRating(int col, const Board* board);
 
+
+
+	int Calculate(const Block* block, BlockType& type, int direction);
 };
 

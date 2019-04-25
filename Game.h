@@ -12,6 +12,8 @@ const int BOARD_HEIGHT = 11;
 class Board: public std::vector<Block>{
 public:
 	Board() : vector<Block>(BOARD_WIDTH*BOARD_HEIGHT){
+
+
 		for(int row=BOARD_HEIGHT-1; row >=0; row--){
 			for(int i=0; i< BOARD_WIDTH; i++){
 				Block* current = &this->at(i+((row)*BOARD_WIDTH));
@@ -60,6 +62,8 @@ public:
 					current->connected[UP] = NULL;
 
 			}
+
+
 		}
 	}
 
@@ -105,6 +109,8 @@ public:
 	int AddBoardPiece(int column, BlockType type);
 
 	int FindMatches();
+	bool find_matches(Block* block, int side);
+	bool find_matches(Block* block);
 
 	void NewGame();
 

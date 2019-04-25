@@ -48,15 +48,47 @@ int Game::AddBoardPiece(int column, BlockType type){
 	return -1;
 }
 
+bool Game::find_matches(Block* block, int side){
+	if(block->type == EMPTY)
+		return false;
+
+	Block* next = block->connected[side];
+	int matches = 1;
+	while(next != NULL){
+		if(next->type == block->type){
+			matches++;
+		}else{
+			break;
+		}
+		next = next->connected[side];
+	}
+	bool result = matches > 2;
+	if(result){
+		next = block;
+		do{
+			next->remove= true;
+			next = next->connected[side];
+		}while(--matches > 0);
+	}
+	return result;
+}
+
+bool Game::find_matches(Block* block){
+	return find_matches(block, RIGHT) |
+			find_matches(block, DOWN) |
+			find_matches(block, DOWN_RIGHT) |
+			find_matches(block, DOWN_LEFT);
+}
+
 int Game::FindMatches(){
 	int found = 0;
-	std::vector<Block>::iterator it = _Board->begin();
-	while(it != _Board->end()){
-		if(it->find_matches())
-			found ++;
-		it++;
-	}
 
+	for(int i=0; i < _Board->size(); i++){
+		Block* b = &_Board->at(i);
+		if(find_matches(b))
+			found ++;
+	}
+	
 	if(found > 0){
 		_Score += CalculateScoreForMatches(found);
 		if(_BlocksMatched == 10){
@@ -237,11 +269,11 @@ void Game::ProcessOrphaned(){
 			}
 			// ok move the column down 1 block
 
-			if(found_empty && current->GetDown()->type == EMPTY){
-				current->GetDown()->type = current->type;
+			if(found_empty && current->connected[DOWN]->type == EMPTY){
+				current->connected[DOWN]->type = current->type;
 				current->type = EMPTY;
-				if(current->GetDown()->GetDown() != NULL){
-					if(current->GetDown()->GetDown()->type == EMPTY){	
+				if(current->connected[DOWN]->connected[DOWN] != NULL){
+					if(current->connected[DOWN]->connected[DOWN]->type == EMPTY){	
 						_HasOrphaned = true;
 					}
 				}
