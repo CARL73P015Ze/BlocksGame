@@ -207,7 +207,7 @@ ColRanking CAIPlayer::CalculateColumnRating(int col, const Board* board){
 	ColRanking diagDownRightRank = {0,0,0};
 
 	for(int y=BOARD_HEIGHT-1; y >= 2; y--){
-		const Block *block = &board->at(col+(BOARD_WIDTH*y));
+		const Block *block = &board->blocks[col+(BOARD_WIDTH*y)];
 		if(block->type == EMPTY){
 			AssignRanking(verticalRank, CalculateVerticalRanking(block));
 			horizontalRank = CalculateHorizontalRanking(block);

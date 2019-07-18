@@ -75,7 +75,7 @@ SDL_Rect CGameScene::BlockTypeToSdlRect(BlockType type){
 }
 
 void CGameScene::RenderBoard(){
-	const std::vector<Block>* board = _Game->GetBoard();
+	
 	SDL_Rect title_dest;
 	SDL_Rect title_source;
 	// we can animate these now.
@@ -111,11 +111,11 @@ void CGameScene::RenderBoard(){
 
 		_Renderer->Render(_Blocks, &title_source, &title_dest);
 	}
-
+	//const Board *board = &_Game->_Board;
 	const Block *block;
 	for(int y=0; y< BOARD_HEIGHT; y++){
 		for(int x = 0; x < BOARD_WIDTH-1; x++){
-			block = &board->at(x+(BOARD_WIDTH*y));
+			block = &_Game->_Board.blocks[x+(BOARD_WIDTH*y)];
 			title_source = BlockTypeToSdlRect(block->type);
 
 			title_source.y = 0;

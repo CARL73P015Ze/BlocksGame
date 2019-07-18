@@ -3,16 +3,70 @@
 #include <cstdlib>
 #include <cmath>
 
+
+void initBoard(Board* board)
+{
+	for(int row=BOARD_HEIGHT-1; row >=0; row--){
+		for(int i=0; i< BOARD_WIDTH; i++){
+			Block* current = &board->blocks[i+((row)*BOARD_WIDTH)];
+
+			current->remove = false;
+			current->type = EMPTY;
+
+			if(i < BOARD_WIDTH-1)
+				current->connected[RIGHT] = &board->blocks[i+1+(row*BOARD_WIDTH)];
+			else
+				current->connected[RIGHT] = NULL;
+
+			if(i > 0)
+				current->connected[LEFT] = &board->blocks[i-1+(row*BOARD_WIDTH)];
+			else
+				current->connected[LEFT] = NULL;
+
+			if(row < BOARD_HEIGHT-1)
+				current->connected[DOWN] = &board->blocks[i+((row+1)*BOARD_WIDTH)];
+			else
+				current->connected[DOWN] = NULL;
+
+			if(i < BOARD_WIDTH-1 && row < BOARD_HEIGHT-1){
+				current->connected[DOWN_RIGHT] = &board->blocks[i+1+((row+1)*BOARD_WIDTH)];
+			}else
+				current->connected[DOWN_RIGHT] = NULL;
+
+			if(i < BOARD_WIDTH-1 && row < BOARD_HEIGHT-1){
+				current->connected[DOWN_LEFT] = &board->blocks[i-1+((row+1)*BOARD_WIDTH)];
+			}else
+				current->connected[DOWN_LEFT] = NULL;
+
+			if(i < BOARD_WIDTH-1 && row > 0){
+				current->connected[UP_RIGHT] = &board->blocks[i+1+((row-1)*BOARD_WIDTH)];
+			}else
+				current->connected[UP_RIGHT] = NULL;
+
+			if(i > 0 && row > 0){
+				current->connected[UP_LEFT] = &board->blocks[i-1+((row-1)*BOARD_WIDTH)];
+			}else
+				current->connected[UP_LEFT] = NULL;
+
+			if(i > 0 && row > 0){
+				current->connected[UP] = &board->blocks[i+((row-1)*BOARD_WIDTH)];
+			}else
+				current->connected[UP] = NULL;
+
+		}
+
+
+	}
+}
+
 Game::Game(void)
 {
-
-	_Board = new Board();
+	initBoard(&_Board);
 }
 
 
 Game::~Game(void)
 {
-	delete _Board;
 }
 
 int Game::CalculateScoreForMatches(int matches){ return (matches * 10); }
@@ -24,7 +78,6 @@ HiScoreTable* Game::GetHiScoreTable(){
 bool Game::IsPlayerAvailable() { 
 	return (!_FoundMatch && !_HasOrphaned); 
 }
-Board* Game::GetBoard() { return _Board; }
 const int& Game::GetScore()  { return _Score; }
 const int& Game::GetLevel(){ return _Level; }
 Player* Game::GetPlayer() { return &_Player; }
@@ -38,7 +91,7 @@ int Game::AddBoardPiece(int column, BlockType type){
 	Block* block;
 		
 	while(row >= 0){
-		block = &_Board->at(column+(row*BOARD_WIDTH));
+		block = &_Board.blocks[column+(row*BOARD_WIDTH)];
 		if(block->type == EMPTY){
 			block->type = type;
 			return 1;
@@ -83,8 +136,8 @@ bool Game::find_matches(Block* block){
 int Game::FindMatches(){
 	int found = 0;
 
-	for(int i=0; i < _Board->size(); i++){
-		Block* b = &_Board->at(i);
+	for(int i=0; i < BOARD_SIZE; i++){
+		Block* b = &_Board.blocks[i];
 		if(find_matches(b))
 			found ++;
 	}
@@ -116,7 +169,7 @@ void Game::NewGame()
 	_HasOrphaned = false;
 
 	for(int i = 0; i < BOARD_WIDTH*BOARD_HEIGHT; i++){
-		_Board->at(i).type = EMPTY;
+		_Board.blocks[i].type = EMPTY;
 	}
 }
 
@@ -124,10 +177,10 @@ bool Game::BlockAt(int column, int row){
 	if(column < 0 || column >= BOARD_WIDTH)
 		return false;
 
-	Block* block = &_Board->at(column+(row*BOARD_WIDTH));
+	Block* block = &_Board.blocks[column+(row*BOARD_WIDTH)];
 		
 	while(row >= 0){
-		block = &_Board->at(column+(row*BOARD_WIDTH));
+		block = &_Board.blocks[column+(row*BOARD_WIDTH)];
 		if(block->type != EMPTY){
 			return true;
 		}
@@ -148,7 +201,7 @@ void Game::MoveLeft(){
 	int x = _Player._X;
 	int y = _Player._Y/32;
 	if(_Player._X > 1){
-		if(_Board->at(x-1+(BOARD_WIDTH*y)).type == EMPTY)
+		if(_Board.blocks[x-1+(BOARD_WIDTH*y)].type == EMPTY)
 			_Player._X--;
 	}else if(_Player._X == 1){
 		_Player._X--;
@@ -159,7 +212,7 @@ void Game::MoveRight(){
 	int x = _Player.getX();
 	int y = _Player._Y/32;
 	if(_Player.getX() < 5){
-		if(_Board->at(x+1+(BOARD_WIDTH*y)).type == EMPTY)
+		if(_Board.blocks[x+1+(BOARD_WIDTH*y)].type == EMPTY)
 			_Player._X++;
 	}else if (_Player.getX() == 6){
 		_Player._X++;
@@ -233,7 +286,7 @@ void Game::RemoveMatchedBlocks(){
 	_HasOrphaned = false;
 	for(int y=0; y< BOARD_HEIGHT; y++){
 		for(int x = 0; x < BOARD_WIDTH; x++){
-			Block& b = _Board->at(x+(BOARD_WIDTH*y));
+			Block& b = _Board.blocks[x+(BOARD_WIDTH*y)];
 			if(b.remove == true){
 				b.remove = false;
 				b.type = EMPTY;
@@ -262,7 +315,7 @@ void Game::ProcessOrphaned(){
 		bool found_empty = false;
 
 		for(int y=BOARD_HEIGHT-1; y>=0 ; y--){
-			current = &_Board->at(x+(BOARD_WIDTH*y));
+			current = &_Board.blocks[x+(BOARD_WIDTH*y)];
 			if(current->type == EMPTY){
 				found_empty = true;
 				continue;
