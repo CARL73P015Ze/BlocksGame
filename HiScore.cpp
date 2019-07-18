@@ -5,10 +5,8 @@
 HiScoreTable::HiScoreTable(void)
 {
 	for(int i=0; i < MAX_TABLE_SIZE; i++){
-		Score* s = new Score();
-		s->Name = "a";
-		s->Value = i*MAX_TABLE_SIZE;
-		Scores.push_back(s);
+		Scores[i].Name = "ABC";
+		Scores[i].Value = i*MAX_TABLE_SIZE;
 	}
 }
 
@@ -17,3 +15,5 @@ HiScoreTable::~HiScoreTable(void)
 {
 	// clear the memory
 }
+
+Score HiScoreTbl[10];

@@ -21,8 +21,6 @@ private:
 	CEvent* _OnConfirmMenuItemYesClick;
 	CEvent* _OnConfirmMenuItemNoClick;
 
-	std::vector<Score*>::const_iterator _HiScoreIterator;
-
 	long _SceneStartedAt;
 public:
 	CStartScene(CRenderer* renderer, CEventDispatcher* dispatcher, HiScoreTable* table);

@@ -134,7 +134,11 @@ public:
 
 		void OnEvent(std::string str){
 			int score = *_Owner->_Score;
-			_Owner->_HiScoreTable->Push(score, str);
+			Score* entry=_Owner->_HiScoreTable->HiScorePosition(score);
+			if(entry != NULL) {
+				entry->Name = str;
+				entry->Value = score;
+			}
 			_Owner->_Dispatcher->Dispatch(E_SCENE_START);
 		}
 	};

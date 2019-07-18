@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include "StartScene.h"
+#include <sstream>
 
 CStartScene::CStartScene(CRenderer* renderer, CEventDispatcher* dispatcher, HiScoreTable* table){
 	_Renderer = renderer;
@@ -69,16 +70,18 @@ void CStartScene::Render(){
 	_Renderer->Render(title, &title_source, &title_dest);
 	std::string str;
 	int y = 405;
-	_HiScoreIterator = _Table->GetScores().begin();
-	while(_HiScoreIterator != _Table->GetScores().end()){
-		str = "";
-		str += (*_HiScoreIterator)->Name.c_str();
-		str += " - ";
-		str += (*_HiScoreIterator)->Value;
+
+	int i = 0;
+	
+	for(int i=0; i < _Table->MAX_TABLE_SIZE; i++){
+		std::ostringstream s;
+
+		s<<_Table->Scores[i].Name.c_str() << " - " << _Table->Scores[i].Value;
+
+		str = s.str();
 
 		_Renderer->RenderString(&str, 100, y);
 		y-= _Renderer->GetFontHeight();
-		_HiScoreIterator++;
 	}
 
 	_MainMenu.Render(_Renderer);

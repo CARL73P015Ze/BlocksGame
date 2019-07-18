@@ -17,8 +17,9 @@ void CGameOverScene::Init(){
 
 void CGameOverScene::OnSceneStarted(){	
 	this->_Alphabet->Clear();
-	_HasHiScore = _HiScoreTable->HasHighScore(*_Score);
-	if(_HasHiScore){
+	Score* entry = _HiScoreTable->HiScorePosition(*_Score);
+	 _HasHiScore = entry != NULL;
+	if(entry != NULL){
 		_ActiveComponent = _Alphabet;
 	}else{
 		_ActiveComponent = NULL;
@@ -41,9 +42,9 @@ void CGameOverScene::Render(){
 	_Renderer->Clear();
 
 	std::string str;
-	int hasHiScorePos = _HiScoreTable->HiScorePosition(*_Score);
-	bool hasHiScore = hasHiScorePos < HiScoreTable::MAX_TABLE_SIZE;
-	if(hasHiScore){
+	//Score* entry = _HiScoreTable->HiScorePosition(*_Score);
+	if(_HasHiScore)// entry != NULL)
+	{
 		str = "Please Enter Your Name";
 		_Renderer->RenderString(&str, 50, 75);
 		_Alphabet->Render(_Renderer);
