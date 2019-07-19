@@ -24,7 +24,6 @@
 #include "GameScene.h"
 #include "GameOverScene.h"
 #include "AIPlayer.h"
-#include "Game.h"
 #include "GameAIScene.h"
 
 int main2();

@@ -1,6 +1,8 @@
 #include "StdAfx.h"
 #include "GameScene.h"
 
+#include <sstream>
+
 CGameScene::CGameScene(CRenderer* renderer, CEventDispatcher* dispatcher){
 		_Renderer = renderer;
 		_Dispatcher = dispatcher;

@@ -36,9 +36,6 @@
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CheckBox.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Animation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -49,9 +46,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TextureLists.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="HiScoreStore.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="HiScore.h">
@@ -90,18 +84,12 @@
     <ClInclude Include="Block.h">
       <Filter>Scenes\Game</Filter>
     </ClInclude>
-    <ClInclude Include="Game.h">
-      <Filter>Scenes\Game</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ColumnsGame.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CheckBox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Animation.cpp">
@@ -111,9 +99,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Renderable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="HiScoreStore.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="HiScore.cpp">
@@ -147,9 +132,6 @@
       <Filter>Scenes\Game</Filter>
     </ClCompile>
     <ClCompile Include="Block.cpp">
-      <Filter>Scenes\Game</Filter>
-    </ClCompile>
-    <ClCompile Include="Game.cpp">
       <Filter>Scenes\Game</Filter>
     </ClCompile>
   </ItemGroup>
