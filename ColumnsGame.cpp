@@ -95,17 +95,17 @@ int main2(  )
 	bool quit = false;
 	CSceneMediator scenes;
 	CEventDispatcher handler(&scenes, &quit);
+	HiScoreTable _Table;
 
-	Game* game = new Game();
-	
-	CStartScene scene(&renderer, &handler, game->GetHiScoreTable());
-	CGameScene game_scene(&renderer, &handler, game);
-	CGameOverScene gameOverScene(&renderer, &handler, game->GetHiScoreTable(), game->GetScore());
+
+	CStartScene scene(&renderer, &handler, &_Table);
+	CGameScene game_scene(&renderer, &handler);
+	CGameOverScene gameOverScene(&renderer, &handler, &_Table, game_scene.GetScore());
 	scene.Init();
 	game_scene.Init();
 	gameOverScene.Init();
 
-	CGameAIScene demo(&renderer, &handler, game);
+	CGameAIScene demo(&renderer, &handler);
 
 	demo.Init();
 

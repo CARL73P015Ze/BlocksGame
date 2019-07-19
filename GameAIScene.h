@@ -9,7 +9,7 @@ private:
 public:
 	virtual std::string GetName();
 
-	CGameAIScene(CRenderer* renderer, CEventDispatcher* dispatcher, Game* game);
+	CGameAIScene(CRenderer* renderer, CEventDispatcher* dispatcher);
 
 	virtual void HandleEvent(const ExternalEvent& e);
 

@@ -4,97 +4,6 @@
 #include "Player.h"
 #include "EventDispatcher.h"
 
-class CPlayer : public CComponent
-{
-private:
-	Game* _Game;
-	SDL_Texture* _Blocks;
-public:
-	 CPlayer(Game* game){
-		 _Game = game;
-		 _Blocks = NULL;
-	 }
-
-	SDL_Rect BlockTypeToSdlRect(BlockType type){
-		SDL_Rect dest;
-		dest.h = 32;
-		dest.w = 32;
-		dest.y = 0;
-		switch(type){
-			case EMPTY: dest.x = 448; break;
-			case RED: dest.x = 192; break;
-			case GREEN: dest.x = 128; break;
-			case ORANGE: dest.x = 64; break;
-			case BLUE: dest.x = 256; break;
-			case YELLOW: dest.x = 0; break;
-			case PURPLE: dest.x = 320; break;
-		}
-		return dest;
-	}
-
-	void HandleEvent(const ExternalEvent& e){
-		if(_Game->IsPlayerAvailable()){
-			if(e == E_PRIMARY_BUTTON_DOWN){
-				_Game->MoveDownFast();
-			}else{
-				_Game->MoveDownNormalSpeed();
-			}
-			if( e == E_DPAD_LEFT_PRESS){
-				_Game->MoveLeft();
-			}
-
-			if( e == E_DPAD_RIGHT_PRESS){
-				_Game->MoveRight();
-			}
-
-			if( e == E_DPAD_DOWN_PRESS){
-				_Game->ShuffleDown();
-			}
-
-			if( e == E_DPAD_UP_PRESS){
-				_Game->ShuffleUp();
-			}
-		}
-	}
-
-	void Render(CRenderer* renderer){
-		if(_Blocks == NULL) 
-			_Blocks = renderer->GetTexture("blocks.bmp");
-		Player* player = _Game->GetPlayer();
-		const PlayerBlock* blocks = player->get_blocks();
-	    SDL_Rect title_dest;
-		SDL_Rect title_source;
-		std::string output = "";
-
-		title_source = BlockTypeToSdlRect(blocks->top);
-		title_dest.w = title_source.w;
-		title_dest.h = title_source.h;
-		title_dest.x = (player->getX()+1) * title_dest.w;
-		title_dest.y = player->_Y + -2 * title_dest.h;
-
-		renderer->Render(_Blocks, &title_source, &title_dest);
-
-
-		title_source = BlockTypeToSdlRect(blocks->middle);
-		title_dest.w = title_source.w;
-		title_dest.h = title_source.h;
-		title_dest.x = (player->getX()+1) * title_dest.w;
-		title_dest.y = player->_Y + -1 * title_dest.h;
-
-		renderer->Render(_Blocks, &title_source, &title_dest);
-
-
-		title_source = BlockTypeToSdlRect(blocks->bottom);
-		title_dest.w = title_source.w;
-		title_dest.h = title_source.h;
-		title_dest.x = (player->getX()+1) * title_dest.w;
-		title_dest.y = player->_Y + 0 * title_dest.h;
-
-		renderer->Render(_Blocks, &title_source, &title_dest);
-	}
-};
-
-
 
 class CGameScene : public CScene
 {
@@ -108,12 +17,10 @@ private:
 	CEvent* _ResumeEvent;
 	Uint32 old;
 	Uint32 last;
-	CPlayer* _player;
 protected:
 	CEventDispatcher* _Dispatcher;
-	Game* _Game; 
 public:
-	CGameScene(CRenderer* renderer, CEventDispatcher* dispatcher, Game* game);
+	CGameScene(CRenderer* renderer, CEventDispatcher* dispatcher);
 	virtual std::string GetName();
 	void Init();
 	void OnSceneStarted();
@@ -121,8 +28,11 @@ public:
 	SDL_Rect BlockTypeToSdlRect(BlockType type);
 	void RenderBoard();
 	void RenderNext();
+	void RenderPlayer();
 	void OnLoop();
 	void Render();
+
+	void initBoard(Board* board);
 
 
 	class QuitEvent : public CEvent{
@@ -147,9 +57,68 @@ public:
 		virtual void OnEvent(){
 			_Scene->last = SDL_GetTicks();
 			_Scene->_PauseMenu->visible = false;
-			_Scene->_ActiveComponent = _Scene->_player;
 		}
 	};
 
+protected:
+	int _Score;
+	int _Level;
+	Player _Player;
+	PlayerBlock _NextBlocks;
+	
+
+	int SpeedMultiplier;
+	
+	bool _FoundMatch;
+	bool _GameOver;
+	bool _HasOrphaned;
+	float _OrphanedYpos;
+
+	int _BlocksMatched;
+
+private:
+	int CalculateScoreForMatches(int matches);
+public:
+	Board _Board;
+	bool IsPlayerAvailable();
+	const int& GetScore();
+	const int& GetLevel();
+	Player* GetPlayer();
+	const PlayerBlock& GetNext();
+	const bool& IsGameOver();
+	int AddBoardPiece(int column, BlockType type);
+
+	int FindMatches();
+	bool find_matches(Block* block, int side);
+	bool find_matches(Block* block);
+
+	void NewGame();
+
+	bool BlockAt(int column, int row);
+
+	void ShuffleUp();
+
+	void ShuffleDown();
+
+	void MoveLeft();
+
+	void MoveRight();
+
+	void MainLoop(long ticks_since_last_run);
+
+
+	const bool& HasOrphaned();
+
+	void RemoveMatchedBlocks();
+
+	void GenerateNext();
+
+	const float& GetOrphanedYpos();
+
+	void ProcessOrphaned();
+
+	void MoveDownFast();
+	void MoveDownNormalSpeed();
+	void RandomizeNext();
 };
 

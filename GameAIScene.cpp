@@ -3,9 +3,9 @@
 
 
 
-CGameAIScene::CGameAIScene(CRenderer* renderer, CEventDispatcher* dispatcher, Game* game) 
-								: CGameScene(renderer, dispatcher, game){
-	_AiPlayer = new CAIPlayer(game->GetPlayer());
+CGameAIScene::CGameAIScene(CRenderer* renderer, CEventDispatcher* dispatcher) 
+								: CGameScene(renderer, dispatcher){
+									_AiPlayer = new CAIPlayer(&_Player);
 }
 
 std::string CGameAIScene::GetName(){ return "DEMO";}
@@ -26,12 +26,12 @@ void CGameAIScene::OnLoop(){
 	long now = SDL_GetTicks(); 
 		
 	// if new block
-	if(_Game->GetPlayer()->getY() < 10){ // needs putting on an event
-		_AiPlayer->CalculateMove(&_Game->_Board);
+	if(GetPlayer()->getY() < 10){ // needs putting on an event
+		_AiPlayer->CalculateMove(&_Board);
 	}
 	if(now - _LastMove > 1000){
 		int t = _AiPlayer->GetTargetX();
-		int f = int(_Game->GetPlayer()->getX() );
+		int f = int(GetPlayer()->getX() );
 		
 		if(_AiPlayer->GetTargetX() < f){
 			CGameScene::HandleEvent(E_DPAD_LEFT_PRESS);
@@ -42,7 +42,7 @@ void CGameAIScene::OnLoop(){
 		}
 		_LastMove = now;
 	}
-	if(_Game->IsGameOver()){
+	if(IsGameOver()){
 		_Dispatcher->Dispatch(E_SCENE_START);
 	}else{
 		CGameScene::OnLoop();
