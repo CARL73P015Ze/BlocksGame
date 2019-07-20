@@ -13,6 +13,9 @@ typedef struct Board{
 	Block blocks[BOARD_WIDTH*BOARD_HEIGHT];
 };
 
+const int GAME_ON_RESUME_EVENT=1;
+const int GAME_ON_QUIT_EVENT=2;
+
 
 class CGameScene : public CScene
 {
@@ -43,31 +46,6 @@ public:
 
 	void initBoard(Board* board);
 
-
-	class QuitEvent : public CEvent{
-	private:
-		CEventDispatcher* _Dispatcher;
-	public:
-		QuitEvent(	CEventDispatcher* dispatcher){
-			_Dispatcher = dispatcher;
-		}
-		virtual void OnEvent(){
-			_Dispatcher->Dispatch(E_SCENE_START);
-		}
-	};
-
-	class ResumeEvent : public CEvent{
-	private:
-		CGameScene* _Scene;
-	public:
-		ResumeEvent(CGameScene* scene){
-			_Scene = scene;
-		}
-		virtual void OnEvent(){
-			_Scene->last = SDL_GetTicks();
-			_Scene->_PauseMenu->visible = false;
-		}
-	};
 
 protected:
 	int _Score;

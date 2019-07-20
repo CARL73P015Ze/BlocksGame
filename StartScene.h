@@ -3,6 +3,12 @@
 #include "Menu.h"
 #include "EventDispatcher.h"
 
+const int ON_START_EVENT=1;
+const int ON_QUIT_EVENT=2;
+const int ON_CONFIRM_MENU_ITEM_YES_CLICKED=3;
+const int ON_CONFIRM_MENU_ITEM_NO_CLICK=4;
+
+
 class CStartScene : public CScene
 {
 private:
@@ -16,11 +22,6 @@ private:
 	CMenu _ConfirmMenu;
 
 	CEventDispatcher* _Dispatcher;
-	CEvent* _OnStartCEvent;
-	CEvent* _OnQuitCEvent;
-	CEvent* _OnConfirmMenuItemYesClick;
-	CEvent* _OnConfirmMenuItemNoClick;
-
 	long _SceneStartedAt;
 public:
 	CStartScene(CRenderer* renderer, CEventDispatcher* dispatcher, HiScoreTable* table);
@@ -30,57 +31,9 @@ public:
 	virtual void HandleEvent(const ExternalEvent& e);
 	void OnLoop();
 	void Render();
-
-
-	class OnStartCEvent : public CEvent{
-		CEventDispatcher* _Dispatcher;
-	public:
-		OnStartCEvent(CEventDispatcher* dispatcher){
-			_Dispatcher = dispatcher;
-		}
-		virtual void OnEvent(){
-			_Dispatcher->Dispatch(E_SCENE_GAME);
-		}
-	};
-
-	class OnQuitCEvent : public CEvent{
-		CStartScene* _StartScene;
-	public:
-		OnQuitCEvent(CStartScene* startScene){
-			_StartScene = startScene;
-		}
-		virtual void OnEvent(){
-			_StartScene->_MainMenu.visible = false;
-			_StartScene->_ConfirmMenu.visible = true;
-			_StartScene->_ActiveComponent = &_StartScene->_ConfirmMenu;
-			_StartScene->_ConfirmMenu.SelectFirst();
-		}
-	};
-
-	class OnConfirmMenuItemYesClick : public CEvent{
-		CEventDispatcher* _Dispatcher;
-	public:
-		OnConfirmMenuItemYesClick(CEventDispatcher* dispatcher){
-			_Dispatcher = dispatcher;
-		}
-		virtual void OnEvent(){
-			_Dispatcher->Dispatch(E_APPCLOSE);
-		}
-	};
-
-	class OnConfirmMenuItemNoClick : public CEvent{
-		CStartScene* _StartScene;
-	public:
-		OnConfirmMenuItemNoClick(CStartScene* startScene){
-			_StartScene = startScene;
-		}
-		virtual void OnEvent(){
-			_StartScene->_MainMenu.visible = true;
-			_StartScene->_ConfirmMenu.visible = false;
-			_StartScene->_ActiveComponent = &_StartScene->_MainMenu;
-		}
-	};
-
-
+	void OnStartEvent();
+	void OnQuitEvent();
+	void OnConfirmMenuItemYesClicked();
+	void OnConfirmMenuItemNoClick();
 };
 

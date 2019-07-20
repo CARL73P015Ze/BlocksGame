@@ -82,8 +82,6 @@ void CGameOverScene::HandleEvent(const ExternalEvent& e){
 				_Row--;
 			}
 		}
-
-		//CScene::HandleEvent(e);
 	}
 }
 
@@ -95,8 +93,7 @@ void CGameOverScene::Render(){
 	_Renderer->Clear();
 
 	std::string str;
-	//Score* entry = _HiScoreTable->HiScorePosition(*_Score);
-	if(_HasHiScore)// entry != NULL)
+	if(_HasHiScore)
 	{
 		str = "Please Enter Your Name";
 		_Renderer->RenderString(&str, 50, 75);

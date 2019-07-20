@@ -23,37 +23,76 @@ void CStartScene::Init(){
 	title_dest.w = 500;
 	title_dest.h = 160;
 
-	_OnStartCEvent = new OnStartCEvent(_Dispatcher);
-	_OnQuitCEvent = new OnQuitCEvent(this);
 	_MainMenu.SetX(300);
 	_MainMenu.SetY(200);
-	_MainMenu.Add("Start", _OnStartCEvent);
-	_MainMenu.Add("Quit", _OnQuitCEvent);
+	_MainMenu.Add("Start", ON_START_EVENT);
+	_MainMenu.Add("Quit", ON_QUIT_EVENT);
 		
-	_OnConfirmMenuItemYesClick = new OnConfirmMenuItemYesClick(_Dispatcher);
-	_OnConfirmMenuItemNoClick = new OnConfirmMenuItemNoClick(this);
-
 	_ConfirmMenu.SetX(300);
 	_ConfirmMenu.SetY(200);
-	_ConfirmMenu.Add("No", _OnConfirmMenuItemNoClick);
-	_ConfirmMenu.Add("Yes", _OnConfirmMenuItemYesClick);
+	_ConfirmMenu.Add("No", ON_CONFIRM_MENU_ITEM_NO_CLICK);
+	_ConfirmMenu.Add("Yes", ON_CONFIRM_MENU_ITEM_YES_CLICKED);
 	_ConfirmMenu.visible = false;
+
 	_MainMenu.SelectFirst();
+
+	_ActiveComponent = &_MainMenu;
 }
 
 void CStartScene::OnSceneStarted(){
 	_ActiveComponent = &_MainMenu;
+	_MainMenu.visible = true;
+	_ConfirmMenu.visible = false;
+
 	_MainMenu.SelectFirst();
 	_SceneStartedAt = SDL_GetTicks();
 }
 
+void CStartScene::OnStartEvent(){
+	_Dispatcher->Dispatch(E_SCENE_GAME);
+}
+
+void CStartScene::OnQuitEvent(){
+	_MainMenu.visible = false;
+	_ConfirmMenu.visible = true;
+	_MainMenu.selected_id = -1;
+	_ConfirmMenu.selected_id = -1;
+	_ActiveComponent = &_ConfirmMenu;
+	_ConfirmMenu.SelectFirst();
+}
+
+void CStartScene::OnConfirmMenuItemYesClicked(){
+	_Dispatcher->Dispatch(E_APPCLOSE);
+}
+
+void CStartScene::OnConfirmMenuItemNoClick(){
+	_MainMenu.visible = true;
+	_ConfirmMenu.visible = false;
+	_MainMenu.SelectFirst();
+	_ActiveComponent = &_MainMenu;
+}
 std::string CStartScene::GetName(){ return "START";}
 
 
 void CStartScene::HandleEvent(const ExternalEvent& e){
-	// consume events
+	_ActiveComponent->HandleEvent(e);
+
 	if(e == E_DPAD_START_PRESS || e == E_PRIMARY_BUTTON_DOWN){
-		_Dispatcher->Dispatch(E_SCENE_GAME);
+		if(_ActiveComponent == &_MainMenu){
+			switch(_MainMenu.selected_id){
+				case ON_START_EVENT:
+					OnStartEvent(); break;
+				case ON_QUIT_EVENT:
+					OnQuitEvent(); break;
+			}
+		}else if(_ActiveComponent == &_ConfirmMenu){
+			switch(_ConfirmMenu.selected_id){
+				case ON_CONFIRM_MENU_ITEM_NO_CLICK:
+					OnConfirmMenuItemNoClick(); break;
+				case ON_CONFIRM_MENU_ITEM_YES_CLICKED:
+					OnConfirmMenuItemYesClicked(); break;
+			}
+		}
 	}
 }
 
@@ -69,21 +108,19 @@ void CStartScene::Render(){
 	_Renderer->Clear();
 	_Renderer->Render(title, &title_source, &title_dest);
 	std::string str;
-	int y = 405;
 
-	int i = 0;
-	
+	int y = 405;
 	for(int i=0; i < _Table->MAX_TABLE_SIZE; i++){
 		std::ostringstream s;
-
 		s<<_Table->Scores[i].Name.c_str() << " - " << _Table->Scores[i].Value;
-
 		str = s.str();
-
 		_Renderer->RenderString(&str, 100, y);
 		y-= _Renderer->GetFontHeight();
 	}
 
-	_MainMenu.Render(_Renderer);
-	_ConfirmMenu.Render(_Renderer);
+	if(_ActiveComponent == &_MainMenu){
+		_MainMenu.Render(_Renderer);
+	}else if(_ActiveComponent == &_ConfirmMenu){
+ 		_ConfirmMenu.Render(_Renderer);
+	}
 }

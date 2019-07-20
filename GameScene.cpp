@@ -9,8 +9,8 @@ CGameScene::CGameScene(CRenderer* renderer, CEventDispatcher* dispatcher){
 
 	initBoard(&_Board);
 
-	}
-	//~CGameScene(void){}
+}
+
 
 std::string CGameScene::GetName(){ return "GAME";}
 
@@ -32,10 +32,8 @@ void CGameScene::Init(){
 	_PauseMenu = new CMenu();
 	_PauseMenu->SetX(100);
 	_PauseMenu->SetY(100);
-	_QuitEvent = new QuitEvent(_Dispatcher);
-	_ResumeEvent = new ResumeEvent(this);
-	_PauseMenu->Add("Resume", _ResumeEvent);
-	_PauseMenu->Add("Quit", _QuitEvent);
+	_PauseMenu->Add("Resume", GAME_ON_RESUME_EVENT);
+	_PauseMenu->Add("Quit", GAME_ON_QUIT_EVENT);
 }
 
 void CGameScene::OnSceneStarted(){
@@ -46,13 +44,28 @@ void CGameScene::OnSceneStarted(){
 
 
 void CGameScene::HandleEvent(const ExternalEvent& e){
+	
 	if(!IsGameOver()){
 		if(e == E_DPAD_START_PRESS){
 			_PauseMenu->visible = true;
 			_PauseMenu->SelectFirst();
 			_ActiveComponent = _PauseMenu;
+		}else if(_ActiveComponent == _PauseMenu){
+			_ActiveComponent->HandleEvent(e);
+			if(e == E_PRIMARY_BUTTON_DOWN){
+
+				switch(_PauseMenu->selected_id){
+					case GAME_ON_RESUME_EVENT:
+						last = SDL_GetTicks();
+						_PauseMenu->visible = false;
+						_ActiveComponent = NULL;
+					break;
+					case GAME_ON_QUIT_EVENT:
+						_Dispatcher->Dispatch(E_SCENE_START);
+				}
+			}
+		
 		}else{
-			CScene::HandleEvent(e);
 
 			if(IsPlayerAvailable()){
 				if(e == E_PRIMARY_BUTTON_DOWN){
@@ -137,7 +150,7 @@ void CGameScene::RenderBoard(){
 
 		_Renderer->Render(_Blocks, &title_source, &title_dest);
 	}
-	//const Board *board = &_Game->_Board;
+
 	const Block *block;
 	for(int y=0; y< BOARD_HEIGHT; y++){
 		for(int x = 0; x < BOARD_WIDTH-1; x++){
@@ -342,6 +355,7 @@ int CGameScene::CalculateScoreForMatches(int matches){ return (matches * 10); }
 bool CGameScene::IsPlayerAvailable() { 
 	return (!_FoundMatch && !_HasOrphaned); 
 }
+
 const int& CGameScene::GetScore()  { return _Score; }
 const int& CGameScene::GetLevel(){ return _Level; }
 Player* CGameScene::GetPlayer() { return &_Player; }
