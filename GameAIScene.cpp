@@ -30,7 +30,6 @@ void CGameAIScene::OnLoop(){
 		_AiPlayer->CalculateMove(&_Board);
 	}
 	if(now - _LastMove > 1000){
-		int t = _AiPlayer->GetTargetX();
 		int f = int(GetPlayer()->getX() );
 		
 		if(_AiPlayer->GetTargetX() < f){

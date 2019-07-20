@@ -27,7 +27,6 @@ void CMenu::HandleEvent(const ExternalEvent& e){
 	}
 
 	if( e == E_PRIMARY_BUTTON_DOWN){
-		int i = items.at(selected)->id;
 		selected_id = items.at(selected)->id;
 	}
 
@@ -46,7 +45,7 @@ void CMenu::Render(CRenderer* renderer){
 	std::string str;
 	std::vector<CMenuItem*>::const_iterator it = items.begin();
 	int offset = 0;
-	int i = 0;
+	unsigned int i = 0;
 	while(it != items.end()){
 		std::string val = (*it)->text;
 		if(selected == i){

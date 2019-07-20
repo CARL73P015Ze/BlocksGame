@@ -129,6 +129,7 @@ xcopy "$(MSBuildProjectDirectory)\resources\SDL2.dll" "$(OutputPath)"
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
@@ -149,7 +150,6 @@ xcopy "$(MSBuildProjectDirectory)\resources\SDL2.dll" "$(OutputPath)"
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Renderer.h" />
-    <ClInclude Include="TextureLists.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AIPlayer.cpp" />

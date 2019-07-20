@@ -263,8 +263,12 @@ void CGameScene::RenderPlayer(){
 	title_source = BlockTypeToSdlRect(blocks->top);
 	title_dest.w = title_source.w;
 	title_dest.h = title_source.h;
-	title_dest.x = (player->getX()+1) * title_dest.w;
-	title_dest.y = player->_Y + -2 * title_dest.h;
+
+	int x = (int)player->getX();
+	int y = (int)player->_Y;
+
+	title_dest.x = (x+1) * title_dest.w;
+	title_dest.y = (int)player->_Y + -2 * title_dest.h;
 
 	_Renderer->Render(_Blocks, &title_source, &title_dest);
 
@@ -272,8 +276,8 @@ void CGameScene::RenderPlayer(){
 	title_source = BlockTypeToSdlRect(blocks->middle);
 	title_dest.w = title_source.w;
 	title_dest.h = title_source.h;
-	title_dest.x = (player->getX()+1) * title_dest.w;
-	title_dest.y = player->_Y + -1 * title_dest.h;
+	title_dest.x = (x+1) * title_dest.w;
+	title_dest.y = y + -1 * title_dest.h;
 
 	_Renderer->Render(_Blocks, &title_source, &title_dest);
 
@@ -281,8 +285,10 @@ void CGameScene::RenderPlayer(){
 	title_source = BlockTypeToSdlRect(blocks->bottom);
 	title_dest.w = title_source.w;
 	title_dest.h = title_source.h;
-	title_dest.x = (player->getX()+1) * title_dest.w;
-	title_dest.y = player->_Y + 0 * title_dest.h;
+	
+	title_dest.x = (x+1) * title_dest.w;
+	
+	title_dest.y = ( y + 0 * title_dest.h);
 
 	_Renderer->Render(_Blocks, &title_source, &title_dest);
 }
@@ -476,10 +482,14 @@ void CGameScene::ShuffleDown(){
 }
 
 void CGameScene::MoveLeft(){
-	int x = _Player._X;
-	int y = _Player._Y/32;
+	
+	int y = (int) _Player._Y/32;
 	if(_Player._X > 1){
-		if(_Board.blocks[x-1+(BOARD_WIDTH*y)].type == EMPTY)
+
+		int x = (int) _Player._X;
+
+		x = x-1+(BOARD_WIDTH*y);
+		if(_Board.blocks[x].type == EMPTY)
 			_Player._X--;
 	}else if(_Player._X == 1){
 		_Player._X--;
@@ -487,10 +497,11 @@ void CGameScene::MoveLeft(){
 }
 
 void CGameScene::MoveRight(){
-	int x = _Player.getX();
-	int y = _Player._Y/32;
+	
+	int y = (int)(_Player._Y/32);
 	if(_Player.getX() < 5){
-		if(_Board.blocks[x+1+(BOARD_WIDTH*y)].type == EMPTY)
+		int x = (int)( _Player.getX()+1+(BOARD_WIDTH*y));
+		if(_Board.blocks[x].type == EMPTY)
 			_Player._X++;
 	}else if (_Player.getX() == 6){
 		_Player._X++;
@@ -514,9 +525,9 @@ void CGameScene::MainLoop(long ticks_since_last_run){
 	//speed == 1000 milies
 	//distance per second 
 		
-	double v = (32.0f / speed ) * SpeedMultiplier;
-	double d = (double)ticks_since_last_run * v; // 0.02133f = 32 / 1500
-	double y_pos = _Player._Y + d;
+	float v = (32.0f / speed ) * SpeedMultiplier;
+	float d = (float)ticks_since_last_run * v; // 0.02133f = 32 / 1500
+	float y_pos = _Player._Y + d;
 
 	// v = d/t
 	// d = v
@@ -530,17 +541,20 @@ void CGameScene::MainLoop(long ticks_since_last_run){
 	int grid_y_pos = (int)y_pos/ 32;
 		
 	if(grid_y_pos < BOARD_HEIGHT){
-		if(BlockAt(_Player._X, grid_y_pos) == EMPTY){
+		int x = (int)_Player._X;
+		if(BlockAt(x, grid_y_pos) == EMPTY){
 			_Player._Y = y_pos;
 			add_to_grid = false;
 		}
 	}
 	if(add_to_grid){
-		int added = AddBoardPiece(_Player.getX(), _Player.get_blocks()->bottom); 
+		int x = (int)_Player.getX();
+
+		int added = AddBoardPiece(x, _Player.get_blocks()->bottom); 
 		if(added == 1)
-			added = AddBoardPiece(_Player.getX(), _Player.get_blocks()->middle);
+			added = AddBoardPiece(x, _Player.get_blocks()->middle);
 		if(added == 1)
-			added = AddBoardPiece(_Player.getX(), _Player.get_blocks()->top);
+			added = AddBoardPiece(x, _Player.get_blocks()->top);
 
 		if(added == 1){
 			_FoundMatch = FindMatches() > 0;

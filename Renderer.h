@@ -6,7 +6,7 @@
 #include <string>
 #include "map"
 #include <vector>
-#include "TextureLists.h"
+
 struct FontSettings{
 	int width;
 	int height;
@@ -16,7 +16,7 @@ struct FontSettings{
 };
 
 
-class CRenderer: public CTextureList
+class CRenderer
 {
 private:
 	SDL_Renderer* _Renderer;
@@ -46,7 +46,7 @@ private:
 	}
 
 	void RenderString(const std::string* str, int x, int y, FontSettings* settings, SDL_Texture* font){
-		for(int i=0; i < str->size(); i++){
+		for(unsigned int i=0; i < str->size(); i++){
 			char c = str->at(i);
 			if(c <= '~' && c >= ' '){
 				RenderChar(c, x, y, settings, font);

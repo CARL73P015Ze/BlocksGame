@@ -14,7 +14,7 @@ class CMenu : public CComponent{
 private:
 	std::vector<CMenuItem*> items;
 
-	int selected;
+	unsigned int selected;
 	int _X;
 	int _Y;
 public:

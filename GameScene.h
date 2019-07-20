@@ -9,7 +9,7 @@ const int BOARD_HEIGHT = 11;
 
 const int BOARD_SIZE = BOARD_WIDTH * BOARD_HEIGHT;
 
-typedef struct Board{
+struct Board{
 	Block blocks[BOARD_WIDTH*BOARD_HEIGHT];
 };
 

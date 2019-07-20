@@ -8,8 +8,8 @@ class CAnimation {
         int    CurrentFrame;
         int     FrameInc;
     private:
-        int     FrameRate; //Milliseconds
-        long    OldTime;
+        unsigned int     FrameRate; //Milliseconds
+        unsigned long    OldTime;
     public:
         int    MaxFrames;
         bool    Oscillate;

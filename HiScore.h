@@ -19,7 +19,7 @@ public:
 	const static int MAX_TABLE_SIZE = 10;
 	Score Scores[MAX_TABLE_SIZE];
 
-	Score* HiScorePosition(const int& newScore){
+	Score* HiScorePosition(const unsigned int& newScore){
 		
 		int i = 0;
 		bool found = false;
