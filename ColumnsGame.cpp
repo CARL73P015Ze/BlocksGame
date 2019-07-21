@@ -13,9 +13,6 @@
 #include <math.h>
 #include <string>
 #include <SDL.h>
-#include "Animation.h"
-#include "Renderer.h"
-#include "Renderable.h"
 #include "Renderer.h"
 #include "HiScore.h"
 #include "Scene.h"

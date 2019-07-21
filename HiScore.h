@@ -11,10 +11,6 @@ struct Score{
 
 class HiScoreTable
 {
-private:
-	
-	
-
 public:
 	const static int MAX_TABLE_SIZE = 10;
 	Score Scores[MAX_TABLE_SIZE];

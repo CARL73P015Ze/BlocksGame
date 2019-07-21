@@ -41,8 +41,3 @@ class CComponent{
 public:
 	virtual void HandleEvent(const ExternalEvent& e) = 0;
 };
-
-class CEvent{
-public:
-	virtual void OnEvent() = 0;
-};

@@ -25,8 +25,6 @@ private:
 	SDL_Rect title_dest;
 	SDL_Texture* _Blocks;
 	CMenu* _PauseMenu;
-	CEvent* _QuitEvent;
-	CEvent* _ResumeEvent;
 	Uint32 old;
 	Uint32 last;
 protected:

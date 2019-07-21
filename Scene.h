@@ -12,7 +12,7 @@
 
 
 
-class CScene : public CComponent{
+class CScene{
 protected:
 	CComponent* _ActiveComponent;
 public:

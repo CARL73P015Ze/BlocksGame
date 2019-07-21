@@ -1,7 +1,6 @@
 #pragma once
 
 #include "stdafx.h"
-#include "Renderable.h"
 #include <SDL.h>
 #include <string>
 #include "map"
@@ -104,21 +103,6 @@ public:
 		SDL_RenderCopy(_Renderer, texture, source, dest);
 	}
 
-	void Render(std::vector<CRenderable*> renderableList){
-		SDL_Rect* source;
-		SDL_Rect* dest;
-		SDL_Texture* texture;
-		CRenderable* item;
-		for(std::vector<CRenderable*>::iterator it = renderableList.begin(); 
-							it != renderableList.end(); ++it){
-			item = (*it);
-			item->OnFrame();
-			texture = item->GetTexture();
-			source = item->GetTextureSourceCoords();
-			dest = item->GetTextureDestCoords();
-			SDL_RenderCopy(_Renderer, texture, source, dest);
-		}
-	}
 
 };
 
