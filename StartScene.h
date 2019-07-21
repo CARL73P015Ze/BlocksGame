@@ -21,14 +21,14 @@ private:
 	CMenu _MainMenu;
 	CMenu _ConfirmMenu;
 
-	CEventDispatcher* _Dispatcher;
+	CSceneContext* _SceneContext;
 	long _SceneStartedAt;
 public:
-	CStartScene(CRenderer* renderer, CEventDispatcher* dispatcher, HiScoreTable* table);
+	CStartScene(CRenderer* renderer, CSceneContext* context, HiScoreTable* table);
 	void Init();
 	void OnSceneStarted();
 	virtual std::string GetName();
-	virtual void HandleEvent(const ExternalEvent& e);
+	virtual void HandleUserInput(const ExternalEvent& e);
 	void OnLoop();
 	void Render();
 	void OnStartEvent();

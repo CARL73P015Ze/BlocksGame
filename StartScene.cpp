@@ -2,9 +2,9 @@
 #include "StartScene.h"
 #include <sstream>
 
-CStartScene::CStartScene(CRenderer* renderer, CEventDispatcher* dispatcher, HiScoreTable* table){
+CStartScene::CStartScene(CRenderer* renderer, CSceneContext* sceneContext, HiScoreTable* table){
 	_Renderer = renderer;
-	_Dispatcher = dispatcher;
+	_SceneContext = sceneContext;
 	_Table = table;
 }
 
@@ -49,7 +49,8 @@ void CStartScene::OnSceneStarted(){
 }
 
 void CStartScene::OnStartEvent(){
-	_Dispatcher->Dispatch(E_SCENE_GAME);
+//	_Dispatcher->Dispatch(E_SCENE_GAME);
+	_SceneContext->SetActiveScene(E_SCENE_GAME);
 }
 
 void CStartScene::OnQuitEvent(){
@@ -62,7 +63,7 @@ void CStartScene::OnQuitEvent(){
 }
 
 void CStartScene::OnConfirmMenuItemYesClicked(){
-	_Dispatcher->Dispatch(E_APPCLOSE);
+	_SceneContext->SetActiveScene(E_APPCLOSE);
 }
 
 void CStartScene::OnConfirmMenuItemNoClick(){
@@ -74,7 +75,7 @@ void CStartScene::OnConfirmMenuItemNoClick(){
 std::string CStartScene::GetName(){ return "START";}
 
 
-void CStartScene::HandleEvent(const ExternalEvent& e){
+void CStartScene::HandleUserInput(const ExternalEvent& e){
 	_ActiveComponent->HandleEvent(e);
 
 	if(e == E_DPAD_START_PRESS || e == E_PRIMARY_BUTTON_DOWN){
@@ -99,7 +100,7 @@ void CStartScene::HandleEvent(const ExternalEvent& e){
 void CStartScene::OnLoop(){
 	long now = SDL_GetTicks();
 	if(now - _SceneStartedAt > 5000){
-		_Dispatcher->Dispatch(E_SCENE_DEMO);
+//		_SceneContext->SetActiveScene(E_SCENE_DEMO);
 	}
 }
 

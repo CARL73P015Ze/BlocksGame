@@ -55,17 +55,11 @@
     <ClInclude Include="EventDispatcher.h">
       <Filter>Component</Filter>
     </ClInclude>
-    <ClInclude Include="StartScene.h">
-      <Filter>Component</Filter>
-    </ClInclude>
     <ClInclude Include="AIPlayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Player.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GameOverScene.h">
-      <Filter>Scenes\Gameover</Filter>
     </ClInclude>
     <ClInclude Include="GameScene.h">
       <Filter>Scenes\Game</Filter>
@@ -75,6 +69,15 @@
     </ClInclude>
     <ClInclude Include="Block.h">
       <Filter>Scenes\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="StartScene.h">
+      <Filter>Scenes\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="GameOverScene.h">
+      <Filter>Scenes\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="GameShutdown.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -99,14 +102,8 @@
     <ClCompile Include="EventDispatcher.cpp">
       <Filter>Component</Filter>
     </ClCompile>
-    <ClCompile Include="StartScene.cpp">
-      <Filter>Component</Filter>
-    </ClCompile>
     <ClCompile Include="Player.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GameOverScene.cpp">
-      <Filter>Scenes\Gameover</Filter>
     </ClCompile>
     <ClCompile Include="GameAIScene.cpp">
       <Filter>Scenes\Game</Filter>
@@ -119,6 +116,15 @@
     </ClCompile>
     <ClCompile Include="Block.cpp">
       <Filter>Scenes\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="StartScene.cpp">
+      <Filter>Scenes\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="GameOverScene.cpp">
+      <Filter>Scenes\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="GameShutdown.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -28,13 +28,13 @@ private:
 	Uint32 old;
 	Uint32 last;
 protected:
-	CEventDispatcher* _Dispatcher;
+	CSceneContext* _SceneContext;
 public:
-	CGameScene(CRenderer* renderer, CEventDispatcher* dispatcher);
+	CGameScene(CRenderer* renderer, CSceneContext* context);
 	virtual std::string GetName();
 	void Init();
 	void OnSceneStarted();
-	virtual void HandleEvent(const ExternalEvent& e);
+	virtual void HandleUserInput(const ExternalEvent& e);
 	SDL_Rect BlockTypeToSdlRect(BlockType type);
 	void RenderBoard();
 	void RenderNext();

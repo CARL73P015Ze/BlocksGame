@@ -22,6 +22,7 @@
 #include "GameOverScene.h"
 #include "AIPlayer.h"
 #include "GameAIScene.h"
+#include "GameShutdown.h"
 
 int main2();
 
@@ -89,19 +90,20 @@ int main2(  )
 	renderer.Clear();
 
 	bool quit = false;
-	CSceneMediator scenes;
-	CEventDispatcher handler(&scenes, &quit);
+	CSceneContext scenes;
+	//CEventDispatcher handler(&scenes, &quit);
 	HiScoreTable _Table;
 
 
-	CStartScene scene(&renderer, &handler, &_Table);
-	CGameScene game_scene(&renderer, &handler);
-	CGameOverScene gameOverScene(&renderer, &handler, &_Table, game_scene.GetScore());
+	CStartScene scene(&renderer, &scenes, &_Table);
+	CGameScene game_scene(&renderer, &scenes);
+	CGameOverScene gameOverScene(&renderer, &scenes, &_Table, game_scene.GetScore());
+	GameShutdown game_shutdown(&renderer);
 	scene.Init();
 	game_scene.Init();
 	gameOverScene.Init();
 
-	CGameAIScene demo(&renderer, &handler);
+	CGameAIScene demo(&renderer, &scenes);
 
 	demo.Init();
 
@@ -110,7 +112,7 @@ int main2(  )
 	scenes.Add(&demo);
 	scenes.Add(&game_scene);
 	scenes.Add(&gameOverScene);
-	scenes.HandleEvents(E_SCENE_START);	
+	scenes.SetActiveScene(E_SCENE_START);	
 
     SDL_RenderPresent(ren);
 	SDL_Event e;
@@ -131,7 +133,13 @@ int main2(  )
 
 
 	bool PRIMARY_BUTTON_DOWN = false;
+	
 	while(!quit){
+		
+		CScene *current = scenes.GetCurrent();
+		if(current == &game_shutdown) 
+			break;
+
         if (SDL_PollEvent(&e)){
 
             if (e.type == SDL_QUIT)
@@ -139,17 +147,17 @@ int main2(  )
 
           if (e.type == SDL_KEYDOWN){
 			  switch(e.key.keysym.scancode){
-				case SDL_SCANCODE_SPACE: handler.Dispatch(E_PRIMARY_BUTTON_DOWN); break;
-				case SDL_SCANCODE_RIGHT: handler.Dispatch(E_DPAD_RIGHT_PRESS); break;
-				case SDL_SCANCODE_LEFT: handler.Dispatch(E_DPAD_LEFT_PRESS); break;
-				case SDL_SCANCODE_UP: handler.Dispatch(E_DPAD_UP_PRESS); break;
-				case SDL_SCANCODE_DOWN: handler.Dispatch(E_DPAD_DOWN_PRESS); break;
-				case SDL_SCANCODE_ESCAPE: handler.Dispatch(E_DPAD_START_PRESS); break;
+			    case SDL_SCANCODE_SPACE: current->HandleUserInput(E_PRIMARY_BUTTON_DOWN); break;
+				case SDL_SCANCODE_RIGHT: current->HandleUserInput(E_DPAD_RIGHT_PRESS); break;
+				case SDL_SCANCODE_LEFT: current->HandleUserInput(E_DPAD_LEFT_PRESS); break;
+				case SDL_SCANCODE_UP: current->HandleUserInput(E_DPAD_UP_PRESS); break;
+				case SDL_SCANCODE_DOWN: current->HandleUserInput(E_DPAD_DOWN_PRESS); break;
+				case SDL_SCANCODE_ESCAPE: current->HandleUserInput(E_DPAD_START_PRESS); break;
 				default: break;
 			  };
 			}else if (e.type == SDL_KEYUP){
 				switch(e.key.keysym.scancode){
-					case SDL_SCANCODE_SPACE: handler.Dispatch(E_PRIMARY_BUTTON_UP); break;
+					case SDL_SCANCODE_SPACE: current->HandleUserInput(E_PRIMARY_BUTTON_UP); break;
 				}
 			}
 		}
@@ -158,31 +166,31 @@ int main2(  )
 
 			// Or space was pressed
 			if(SDL_GameControllerGetButton(gamecontroller, SDL_CONTROLLER_BUTTON_A) == PRESSED){
-				handler.Dispatch(E_PRIMARY_BUTTON_DOWN);
+				current->HandleUserInput(E_PRIMARY_BUTTON_DOWN);
 				PRIMARY_BUTTON_DOWN =true;
 			}else if(PRIMARY_BUTTON_DOWN){
-				handler.Dispatch(E_PRIMARY_BUTTON_UP);
+				current->HandleUserInput(E_PRIMARY_BUTTON_UP);
 				PRIMARY_BUTTON_DOWN =false;
 			}
 
 			if(SDL_GameControllerGetButton(gamecontroller, SDL_CONTROLLER_BUTTON_DPAD_LEFT) == PRESSED){
-				handler.Dispatch(E_DPAD_LEFT_PRESS);
+				current->HandleUserInput(E_DPAD_LEFT_PRESS);
 			}
 
 			if(SDL_GameControllerGetButton(gamecontroller, SDL_CONTROLLER_BUTTON_DPAD_RIGHT) == PRESSED){
-				handler.Dispatch(E_DPAD_RIGHT_PRESS);
+				current->HandleUserInput(E_DPAD_RIGHT_PRESS);
 			}
 
 			if(SDL_GameControllerGetButton(gamecontroller, SDL_CONTROLLER_BUTTON_DPAD_UP) == PRESSED){
-				handler.Dispatch(E_DPAD_UP_PRESS);
+				current->HandleUserInput(E_DPAD_UP_PRESS);
 			}
 
 			if(SDL_GameControllerGetButton(gamecontroller, SDL_CONTROLLER_BUTTON_DPAD_DOWN) == PRESSED){
-				handler.Dispatch(E_DPAD_DOWN_PRESS);
+				current->HandleUserInput(E_DPAD_DOWN_PRESS);
 			}
 
 			if(SDL_GameControllerGetButton(gamecontroller, SDL_CONTROLLER_BUTTON_START) == PRESSED){
-				handler.Dispatch(E_DPAD_START_PRESS);
+				current->HandleUserInput(E_DPAD_START_PRESS);
 			}
 		}
 		scenes.GetCurrent()->OnLoop();

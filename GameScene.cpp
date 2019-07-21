@@ -3,9 +3,9 @@
 
 #include <sstream>
 
-CGameScene::CGameScene(CRenderer* renderer, CEventDispatcher* dispatcher){
+CGameScene::CGameScene(CRenderer* renderer, CSceneContext* context){
 		_Renderer = renderer;
-		_Dispatcher = dispatcher;
+		_SceneContext = context;
 
 	initBoard(&_Board);
 
@@ -40,10 +40,12 @@ void CGameScene::OnSceneStarted(){
 	NewGame();
 	last = SDL_GetTicks();
 	_PauseMenu->visible = false;
+	_GameOver = false;
+	_ActiveComponent = NULL;
 }
 
 
-void CGameScene::HandleEvent(const ExternalEvent& e){
+void CGameScene::HandleUserInput(const ExternalEvent& e){
 	
 	if(!IsGameOver()){
 		if(e == E_DPAD_START_PRESS){
@@ -61,7 +63,7 @@ void CGameScene::HandleEvent(const ExternalEvent& e){
 						_ActiveComponent = NULL;
 					break;
 					case GAME_ON_QUIT_EVENT:
-						_Dispatcher->Dispatch(E_SCENE_START);
+						_SceneContext->SetActiveScene(E_SCENE_START);
 				}
 			}
 		
@@ -205,7 +207,7 @@ void CGameScene::OnLoop(){
 	long ticks_since_last_run = now - last;
 	last = now;
 	if(IsGameOver()){
-		_Dispatcher->Dispatch(E_SCENE_GAME_OVER);
+		_SceneContext->SetActiveScene(E_SCENE_GAME_OVER);
 	}else if(IsPlayerAvailable()){
 		MainLoop(ticks_since_last_run);
 		old = 0;

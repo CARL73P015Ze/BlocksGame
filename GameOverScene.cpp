@@ -2,9 +2,9 @@
 #include "GameOverScene.h"
 
 
-CGameOverScene::CGameOverScene(CRenderer* renderer, CEventDispatcher* dispatcher, HiScoreTable* table, const int& score){
+CGameOverScene::CGameOverScene(CRenderer* renderer, CSceneContext* context, HiScoreTable* table, const int& score){
 	_Renderer = renderer;
-	_Dispatcher = dispatcher;
+	_SceneContext = context;
 	_HiScoreTable = table;
 	_Score = &score;
 }
@@ -20,9 +20,9 @@ void CGameOverScene::OnSceneStarted(){
 	_ActiveComponent = NULL;
 }
 
-void CGameOverScene::HandleEvent(const ExternalEvent& e){
+void CGameOverScene::HandleUserInput(const ExternalEvent& e){
 	if(!_HasHiScore && e == E_PRIMARY_BUTTON_UP){
-		_Dispatcher->Dispatch(E_SCENE_START);
+		_SceneContext->SetActiveScene(E_SCENE_START);
 	}else{
 
 		if(_Row == 0){
@@ -66,7 +66,7 @@ void CGameOverScene::HandleEvent(const ExternalEvent& e){
 					entry->Name = _InputtedString;
 					entry->Value = score;
 				}
-				_Dispatcher->Dispatch(E_SCENE_START);
+				_SceneContext->SetActiveScene(E_SCENE_START);
 
 					// save the high score and show main screen
 				}else{

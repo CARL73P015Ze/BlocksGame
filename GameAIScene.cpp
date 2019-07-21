@@ -3,17 +3,17 @@
 
 
 
-CGameAIScene::CGameAIScene(CRenderer* renderer, CEventDispatcher* dispatcher) 
-								: CGameScene(renderer, dispatcher){
+CGameAIScene::CGameAIScene(CRenderer* renderer, CSceneContext* context) 
+								: CGameScene(renderer, context){
 									_AiPlayer = new CAIPlayer(&_Player);
 }
 
 std::string CGameAIScene::GetName(){ return "DEMO";}
 
-void CGameAIScene::HandleEvent(const ExternalEvent& e){
+void CGameAIScene::HandleUserInput(const ExternalEvent& e){
 	// consume events
 	if(e == E_DPAD_START_PRESS || e == E_PRIMARY_BUTTON_DOWN){
-		_Dispatcher->Dispatch(E_SCENE_START);
+		_SceneContext->SetActiveScene(E_SCENE_START);
 	}
 }
 
@@ -33,16 +33,16 @@ void CGameAIScene::OnLoop(){
 		int f = int(GetPlayer()->getX() );
 		
 		if(_AiPlayer->GetTargetX() < f){
-			CGameScene::HandleEvent(E_DPAD_LEFT_PRESS);
+			CGameScene::HandleUserInput(E_DPAD_LEFT_PRESS);
 		}else if(_AiPlayer->GetTargetX() > f){
-			CGameScene::HandleEvent(E_DPAD_RIGHT_PRESS);
+			CGameScene::HandleUserInput(E_DPAD_RIGHT_PRESS);
 		}else if(_AiPlayer->ShouldRotate()){
-			CGameScene::HandleEvent(E_DPAD_DOWN_PRESS);
+			CGameScene::HandleUserInput(E_DPAD_DOWN_PRESS);
 		}
 		_LastMove = now;
 	}
 	if(IsGameOver()){
-		_Dispatcher->Dispatch(E_SCENE_START);
+		_SceneContext->SetActiveScene(E_SCENE_START);
 	}else{
 		CGameScene::OnLoop();
 	}

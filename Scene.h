@@ -20,7 +20,7 @@ public:
 		_ActiveComponent = NULL;
 	}
 
-	virtual void HandleEvent(const ExternalEvent& e){
+	virtual void HandleUserInput(const ExternalEvent& e){
 		
 		if(_ActiveComponent != NULL){
 			_ActiveComponent->HandleEvent(e);

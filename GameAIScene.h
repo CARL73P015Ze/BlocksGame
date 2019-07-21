@@ -9,9 +9,9 @@ private:
 public:
 	virtual std::string GetName();
 
-	CGameAIScene(CRenderer* renderer, CEventDispatcher* dispatcher);
+	CGameAIScene(CRenderer* renderer, CSceneContext* context);
 
-	virtual void HandleEvent(const ExternalEvent& e);
+	virtual void HandleUserInput(const ExternalEvent& e);
 
 	void OnSceneStarted();
 

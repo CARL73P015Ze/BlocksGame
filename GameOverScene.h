@@ -11,7 +11,7 @@ private:
 	SDL_Rect title_source;
 	SDL_Rect title_dest;
 	SDL_Texture* title;
-	CEventDispatcher* _Dispatcher;
+	CSceneContext* _SceneContext;
 	HiScoreTable* _HiScoreTable;
 	const int* _Score;
 	bool _HasHiScore;
@@ -21,12 +21,12 @@ private:
 	int _SelectedCommand;
 	int _Row;
 public:
-	CGameOverScene(CRenderer* renderer, CEventDispatcher* dispatcher, HiScoreTable* table, const int& score);
+	CGameOverScene(CRenderer* renderer, CSceneContext* context, HiScoreTable* table, const int& score);
 	void Init();
 
 	void OnSceneStarted();
 
-	virtual void HandleEvent(const ExternalEvent& e);
+	virtual void HandleUserInput(const ExternalEvent& e);
 
 	virtual std::string GetName();
 
