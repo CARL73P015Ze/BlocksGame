@@ -2,6 +2,7 @@
 #include "Scene.h"
 #include "Menu.h"
 #include "EventDispatcher.h"
+#include "HiScore.h"
 
 const int ON_START_EVENT=1;
 const int ON_QUIT_EVENT=2;
@@ -20,6 +21,8 @@ private:
 
 	CMenu _MainMenu;
 	CMenu _ConfirmMenu;
+
+	CMenu *_CurrentMenu;
 
 	CSceneContext* _SceneContext;
 	long _SceneStartedAt;

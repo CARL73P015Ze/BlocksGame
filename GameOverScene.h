@@ -2,6 +2,7 @@
 #include "Scene.h"
 #include "Component.h"
 #include "EventDispatcher.h"
+#include "HiScore.h"
 
 class CGameOverScene : public CScene
 {

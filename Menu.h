@@ -10,7 +10,7 @@ public:
 	int id;
 };
 
-class CMenu : public CComponent{
+class CMenu : public CUserControl{
 private:
 	std::vector<CMenuItem*> items;
 

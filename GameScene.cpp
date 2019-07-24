@@ -14,8 +14,8 @@ CGameScene::CGameScene(CRenderer* renderer, CSceneContext* context){
 
 std::string CGameScene::GetName(){ return "GAME";}
 
-void CGameScene::Init(){
-	CScene::Init();
+void CGameScene::Init()
+{
 	NewGame();
 	_Blocks = _Renderer->GetTexture("blocks.bmp");
 
@@ -41,7 +41,7 @@ void CGameScene::OnSceneStarted(){
 	last = SDL_GetTicks();
 	_PauseMenu->visible = false;
 	_GameOver = false;
-	_ActiveComponent = NULL;
+	_CurrentMenu = NULL;
 }
 
 
@@ -51,16 +51,16 @@ void CGameScene::HandleUserInput(const ExternalEvent& e){
 		if(e == E_DPAD_START_PRESS){
 			_PauseMenu->visible = true;
 			_PauseMenu->SelectFirst();
-			_ActiveComponent = _PauseMenu;
-		}else if(_ActiveComponent == _PauseMenu){
-			_ActiveComponent->HandleEvent(e);
+			_CurrentMenu = _PauseMenu;
+		}else if(_CurrentMenu == _PauseMenu){
+			_CurrentMenu->HandleEvent(e);
 			if(e == E_PRIMARY_BUTTON_DOWN){
 
 				switch(_PauseMenu->selected_id){
 					case GAME_ON_RESUME_EVENT:
 						last = SDL_GetTicks();
 						_PauseMenu->visible = false;
-						_ActiveComponent = NULL;
+						_CurrentMenu = NULL;
 					break;
 					case GAME_ON_QUIT_EVENT:
 						_SceneContext->SetActiveScene(E_SCENE_START);

@@ -25,6 +25,7 @@ private:
 	SDL_Rect title_dest;
 	SDL_Texture* _Blocks;
 	CMenu* _PauseMenu;
+	CMenu *_CurrentMenu;
 	Uint32 old;
 	Uint32 last;
 protected:
@@ -43,7 +44,6 @@ public:
 	void Render();
 
 	void initBoard(Board* board);
-
 
 protected:
 	int _Score;

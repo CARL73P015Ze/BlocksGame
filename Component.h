@@ -37,7 +37,7 @@ enum ExternalEvent
   E_DPAD_START_PRESS
 };
 
-class CComponent{
+class CUserControl{
 public:
 	virtual void HandleEvent(const ExternalEvent& e) = 0;
 };

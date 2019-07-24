@@ -91,7 +91,6 @@ int main2(  )
 
 	bool quit = false;
 	CSceneContext scenes;
-	//CEventDispatcher handler(&scenes, &quit);
 	HiScoreTable _Table;
 
 
@@ -112,6 +111,7 @@ int main2(  )
 	scenes.Add(&demo);
 	scenes.Add(&game_scene);
 	scenes.Add(&gameOverScene);
+	scenes.Add(&game_shutdown);
 	scenes.SetActiveScene(E_SCENE_START);	
 
     SDL_RenderPresent(ren);
@@ -194,7 +194,7 @@ int main2(  )
 			}
 		}
 		scenes.GetCurrent()->OnLoop();
-		scenes.GetCurrent()->Play();
+		scenes.GetCurrent()->Render();
 		SDL_RenderPresent(ren);
 	}
 

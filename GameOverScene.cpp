@@ -10,14 +10,12 @@ CGameOverScene::CGameOverScene(CRenderer* renderer, CSceneContext* context, HiSc
 }
 
 void CGameOverScene::Init(){
-	_ActiveComponent = NULL;
 }
 
 void CGameOverScene::OnSceneStarted(){	
 	Clear();
 	Score* entry = _HiScoreTable->HiScorePosition(*_Score);
 	 _HasHiScore = entry != NULL;
-	_ActiveComponent = NULL;
 }
 
 void CGameOverScene::HandleUserInput(const ExternalEvent& e){

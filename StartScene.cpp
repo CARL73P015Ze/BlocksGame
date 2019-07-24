@@ -9,8 +9,6 @@ CStartScene::CStartScene(CRenderer* renderer, CSceneContext* sceneContext, HiSco
 }
 
 void CStartScene::Init(){
-	CScene::Init();
-
 	title = _Renderer->GetTexture("fonts.bmp");
 
 	title_source.x = 0;
@@ -36,15 +34,15 @@ void CStartScene::Init(){
 
 	_MainMenu.SelectFirst();
 
-	_ActiveComponent = &_MainMenu;
+	_MainMenu.visible = true;
 }
 
 void CStartScene::OnSceneStarted(){
-	_ActiveComponent = &_MainMenu;
-	_MainMenu.visible = true;
 	_ConfirmMenu.visible = false;
 
+	_MainMenu.visible = true;
 	_MainMenu.SelectFirst();
+	_CurrentMenu = &_MainMenu;
 	_SceneStartedAt = SDL_GetTicks();
 }
 
@@ -54,12 +52,14 @@ void CStartScene::OnStartEvent(){
 }
 
 void CStartScene::OnQuitEvent(){
-	_MainMenu.visible = false;
-	_ConfirmMenu.visible = true;
 	_MainMenu.selected_id = -1;
+	_MainMenu.visible = false;
+
 	_ConfirmMenu.selected_id = -1;
-	_ActiveComponent = &_ConfirmMenu;
+	_ConfirmMenu.visible = true;
 	_ConfirmMenu.SelectFirst();
+
+	_CurrentMenu = &_ConfirmMenu;
 }
 
 void CStartScene::OnConfirmMenuItemYesClicked(){
@@ -70,23 +70,28 @@ void CStartScene::OnConfirmMenuItemNoClick(){
 	_MainMenu.visible = true;
 	_ConfirmMenu.visible = false;
 	_MainMenu.SelectFirst();
-	_ActiveComponent = &_MainMenu;
+	_MainMenu.visible = true;
+
+	_CurrentMenu = &_MainMenu;
 }
 std::string CStartScene::GetName(){ return "START";}
 
 
 void CStartScene::HandleUserInput(const ExternalEvent& e){
-	_ActiveComponent->HandleEvent(e);
+
+	_CurrentMenu->HandleEvent(e);
+
+
 
 	if(e == E_DPAD_START_PRESS || e == E_PRIMARY_BUTTON_DOWN){
-		if(_ActiveComponent == &_MainMenu){
+		if(_CurrentMenu == &_MainMenu){
 			switch(_MainMenu.selected_id){
 				case ON_START_EVENT:
 					OnStartEvent(); break;
 				case ON_QUIT_EVENT:
 					OnQuitEvent(); break;
 			}
-		}else if(_ActiveComponent == &_ConfirmMenu){
+		}else if(_CurrentMenu == &_ConfirmMenu){
 			switch(_ConfirmMenu.selected_id){
 				case ON_CONFIRM_MENU_ITEM_NO_CLICK:
 					OnConfirmMenuItemNoClick(); break;
@@ -119,9 +124,7 @@ void CStartScene::Render(){
 		y-= _Renderer->GetFontHeight();
 	}
 
-	if(_ActiveComponent == &_MainMenu){
-		_MainMenu.Render(_Renderer);
-	}else if(_ActiveComponent == &_ConfirmMenu){
- 		_ConfirmMenu.Render(_Renderer);
-	}
+	if(_CurrentMenu->visible)
+		_CurrentMenu->Render(_Renderer);
+
 }
