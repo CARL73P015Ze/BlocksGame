@@ -1,32 +1,127 @@
 #include "StdAfx.h"
 #include "AIPlayer.h"
 
+using namespace game;
 
 
 
-ColRanking CAIPlayer::InnerCalculateMove(const Board* board){
-	ColRanking result;
-	result.column = 0;
-	result.fullRanking = 0;
-	result.partialRanking = 0;
-	// for each column
-	ColRanking newrank;
-	for(int col=0; col < BOARD_WIDTH; col++){
-		newrank = CalculateColumnRating(col, board);
-		if(newrank.fullRanking > result.fullRanking){
-			result.column = col;
-			result.fullRanking = newrank.fullRanking;
-			result.partialRanking = newrank.partialRanking;
+bool game::IsBetterRanking(const ColRanking* potential, ColRanking* best_rank)
+{
+
+	//5  1 > 0
+	//4  1 > 0
+	//3  1 > 0
+	//2  1 > 4
+	//1  1 > 0
+
+
+	//5  0 > 0
+	//4  0 > 0
+	//3  0 > 1
+	//2  1 > 0
+	//1  0 > 0
+
+//	bool pIsBetter = false;
+
+
+	//return res;
+
+	int p = (potential->blocks_matched[3]) +
+		(potential->blocks_matched[4]) +
+		(potential->blocks_matched[5]) +
+		(potential->blocks_matched[6]);
+	
+	int b = (best_rank->blocks_matched[3]) +
+		(best_rank->blocks_matched[4]) +
+		(best_rank->blocks_matched[5]) +
+		(best_rank->blocks_matched[6]);
+
+	if(p==0 && b == 0){
+		// ok no full matches, so lets look at the partials
+		if(potential->blocks_matched[2] >= best_rank->blocks_matched[2]) 
+		{
+			return potential->y > best_rank->y; // ok, so we want the lowest position on the board
 		}
-		if(result.fullRanking == 0){
-			if(newrank.partialRanking > result.partialRanking){
-				result.column = col;
-				result.fullRanking = newrank.fullRanking;
-				result.partialRanking = newrank.partialRanking;
+		
+		if(potential->blocks_matched[1] >= best_rank->blocks_matched[1]) 
+		{
+			return potential->y > best_rank->y; // ok, so we want the lowest position on the board
+		}
+
+		return false;
+	}else if(b>p) 
+		return false;
+	{
+		// ok we got a full match, so just pick the best one...
+		for(int i=6; i > 2; i--){
+			if(best_rank->blocks_matched[i] > potential->blocks_matched[i]){	
+
+				break;
+			}
+			else if(potential->blocks_matched[i] > 0){
+				return true;
 			}
 		}
 	}
-	return result;
+
+
+	return false;
+	
+	
+}
+
+void game::AssignIfBetterRanking(const ColRanking* potential, ColRanking* best_rank)
+{
+	bool better = IsBetterRanking(potential, best_rank);
+
+	if(better) 
+	{
+		best_rank->col = potential->col;
+		best_rank->y = potential->y;
+		for(int i=0; i<=BLOCKS_MATCHED_SIZE; i++)
+		{
+			best_rank->blocks_matched[i] = potential->blocks_matched[i];
+		}
+	}
+}
+
+// find best column per rotation of the players block
+ColRanking CAIPlayer::CalculatePerRotation(const Board* board, PlayerBlock* pb)
+{
+	ColRanking best_rank;
+	best_rank.y = -1;
+	best_rank.col = 0;
+	for(int i=0; i<=BLOCKS_MATCHED_SIZE; i++)
+	{
+		best_rank.blocks_matched[i] = 0;
+	}
+	
+	// for each column
+	ColRanking colRanking;
+	for(int col=0; col < BOARD_WIDTH; col++)
+	{
+		colRanking.col = col;
+		for(int i=0; i<=BLOCKS_MATCHED_SIZE; i++)
+			colRanking.blocks_matched[i] = 0;
+
+		for(int y=BOARD_HEIGHT-1; y > 3; y--)
+		{
+			const Block *board_block = &board->blocks[col+(BOARD_WIDTH*y)];
+			if(board_block->type == EMPTY){
+				colRanking.y = y;
+				CalculateVerticalRankingScore(board_block, pb, &colRanking);
+				// need to do the calculation for each block, 
+				CalculateHorizontalRanking(board_block, pb, &colRanking);
+
+				CalculateDiagUpRightRankingScore(board_block, pb, &colRanking);
+			    CalculateDiagDownRightRankingScore(board_block, pb, &colRanking);
+				break;
+			}
+		}
+		
+		AssignIfBetterRanking(&colRanking, &best_rank);
+	}
+	return best_rank;
 }
 
 
@@ -46,34 +141,47 @@ CAIPlayer::CAIPlayer(Player* player){
 	_Player = player;
 }
 
+
+
+
 void CAIPlayer::CalculateMove(const Board* board){
 	this->Blocks = _Player->Blocks;
 	_TargetRotation = 0;
-	ColRanking noRotation = InnerCalculateMove(board);
+	ColRanking noRotation = CalculatePerRotation(board, &Blocks);
 
 	this->ShuffleDown();
-	ColRanking rotateOnce = InnerCalculateMove(board);
+	ColRanking rotateOnce = CalculatePerRotation(board, &Blocks);
 		
 	this->ShuffleDown();
-	ColRanking rotateTwice = InnerCalculateMove(board);
+	ColRanking rotateTwice = CalculatePerRotation(board, &Blocks);
 
 	this->ShuffleUp();
 	this->ShuffleUp();
 	_TargetRotation = 2;
+	_TargetX = rotateTwice.col;
 
-	ColRanking* useRaking = &rotateTwice;
-	if(rotateOnce.fullRanking > useRaking->fullRanking ||
-		(useRaking->fullRanking == 0 && rotateOnce.partialRanking > useRaking->partialRanking )){
-		useRaking = &rotateOnce;
+	ColRanking* best = &rotateTwice;
+
+	if(IsBetterRanking(&rotateOnce, best))
+	{
 		_TargetRotation = 1;
+		_TargetX = rotateOnce.col;
+		best = &rotateOnce;
 	}
-	if(noRotation.fullRanking > useRaking->fullRanking ||
-		(useRaking->fullRanking == 0 && noRotation.partialRanking > useRaking->partialRanking )){
-		useRaking = &noRotation;
+	if(IsBetterRanking(&noRotation, best))
+	{
 		_TargetRotation = 0;
+		_TargetX = noRotation.col;
 	}
 
-	_TargetX = useRaking->column;
+
+
+	//colPriorityWhenNoFullMatch
+
+	// if no full match
+
+
+
 }
 
 int& CAIPlayer::GetTargetX(){
@@ -81,157 +189,107 @@ int& CAIPlayer::GetTargetX(){
 }
 
 int CAIPlayer::GetTargetRotation(){
-	return _TargetX;
+	return _TargetRotation;
 }
 
-int CAIPlayer::CalculateVerticalRanking(const Block* block){
-	int rank = Calculate(block, this->Blocks.bottom, DOWN);	
-	if(Blocks.middle == Blocks.bottom){
-		rank++;
-	}
+void CAIPlayer::CalculateVerticalRankingScore(const Block* board_block, 
+	PlayerBlock* pb, ColRanking* rank)
+{
+	BlockType type = pb->bottom;
+	unsigned short matched = 1;
+	const Block* blk = board_block->connected[DOWN];
 
-	if(Blocks.middle == Blocks.top){
-		rank++;
-	}
-	return rank;
-}
-
-ColRanking CAIPlayer::CalculateHorizontalRanking(const Block* block){
-	ColRanking rank = {0, 0, 0};
-	int r = 0;
-
-	r = CalculateHorizontalRanking(block, this->Blocks.bottom);
-	AssignRanking(rank, r);
-
-	const Block* up1 = block->connected[UP];
-	if(up1 != NULL){
-		r = CalculateHorizontalRanking(block->connected[UP], this->Blocks.middle);
-		AssignRanking(rank, r);
-
-		const Block* up2 = up1->connected[UP];
-		if(up2 != NULL){
-			r = CalculateHorizontalRanking(up2, Blocks.top);
-			AssignRanking(rank, r);
-		}
-	}
-
-	return rank;
-}
-
-void CAIPlayer::AssignRanking(ColRanking& rank, int ranking){
-	if(ranking > 2)
-		rank.fullRanking += ranking;
-	else
-		rank.partialRanking += ranking;
-}
-
-int CAIPlayer::CalculateHorizontalRanking(const Block* block, BlockType& type){
-	return Calculate(block, type, RIGHT) + Calculate(block, type, LEFT) + 1;
-}
-
-
-ColRanking CAIPlayer::CalculateDiagUpRight(const Block* block){
-	ColRanking rank = {0, 0, 0};
-	int r = 0;
-
-	r = CalculateDiagUpRight(block, this->Blocks.bottom);
-	AssignRanking(rank, r);
-
-	const Block* up1 = block->connected[UP];
-	if(up1 != NULL){
-		r = CalculateDiagUpRight(block->connected[UP], this->Blocks.middle);
-		AssignRanking(rank, r);
-
-		const Block* up2 = up1->connected[UP];
-		if(up2 != NULL){
-			r = CalculateDiagUpRight(up2, Blocks.top);
-			AssignRanking(rank, r);
-		}
-	}
-
-	return rank;
-}
-
-int CAIPlayer::CalculateDiagUpRight(const Block* block, BlockType& type){
-	return Calculate(block, type, UP_RIGHT) + Calculate(block, type, DOWN_LEFT) + 1;
-}
-
-
-ColRanking CAIPlayer::CalculateDiagDownRight(const Block* block){
-	ColRanking rank = {0, 0, 0};
-	int r = 0;
-
-	r = CalculateDiagDownRight(block, this->Blocks.bottom);
-	AssignRanking(rank, r);
-
-	const Block* up1 = block->connected[UP];
-	if(up1 != NULL){
-		r = CalculateDiagDownRight(block->connected[UP], this->Blocks.middle);
-		AssignRanking(rank, r);
-
-		const Block* up2 = up1->connected[UP];
-		if(up2 != NULL){
-			r = CalculateDiagDownRight(up2, Blocks.top);
-			AssignRanking(rank, r);
-		}
-	}
-
-	return rank;
-}
-
-int CAIPlayer::Calculate(const Block* block, BlockType& type, int direction){
-	int ddrank = 1;
-	if(block->connected[direction] != NULL &&
-		block->connected[direction]->type == this->Blocks.bottom){
-		ddrank++;
-		// ok we found a possible match
-		if(block->connected[direction]->connected[direction] != NULL &&
-			block->connected[direction]->connected[direction]->type == this->Blocks.bottom){
-			ddrank++;
-		}
-	}
-
-	return ddrank;
-}
-
-int CAIPlayer::CalculateDiagDownRight(const Block* block, BlockType& type){
-	return Calculate(block, type, DOWN_RIGHT) + Calculate(block, type, UP_LEFT) - 1;
-}
-
-ColRanking CAIPlayer::CalculateColumnRating(int col, const Board* board){
-	// don't both about the last 2 blocks, since we can't place the block anyway
-	// find bottom empty block in the column;
-	ColRanking verticalRank = {0,0,0};
-	ColRanking horizontalRank = {0,0,0};
-	ColRanking diagUpRightRank = {0,0,0};
-	ColRanking diagDownRightRank = {0,0,0};
-
-	for(int y=BOARD_HEIGHT-1; y >= 2; y--){
-		const Block *block = &board->blocks[col+(BOARD_WIDTH*y)];
-		if(block->type == EMPTY){
-			AssignRanking(verticalRank, CalculateVerticalRanking(block));
-			horizontalRank = CalculateHorizontalRanking(block);
-			diagUpRightRank = CalculateDiagUpRight(block);
-			diagDownRightRank = CalculateDiagDownRight(block);
+	for(int i=0; i < 10; i++)
+	{
+		if ((blk == nullptr) || (blk->type != type) )
+		{
 			break;
-		}
+		}else if (blk->type == type)		
+			matched++;
+
+		blk = blk->connected[DOWN];
 	}
 
-	ColRanking result;
-	result.fullRanking = 0;
-	result.partialRanking = 0;
+	if(pb->middle == type){
+		matched++;
+
+		if(pb->top == type)
+			matched++;
+	}
+	
+	matched &= BLOCKS_MATCHED_SIZE; // ensure it fits
+	rank->blocks_matched[matched] += 1;
 
 
+}
 
-	result.fullRanking += verticalRank.fullRanking;
-	result.fullRanking += horizontalRank.fullRanking;
-	result.fullRanking += diagUpRightRank.fullRanking;
-	result.fullRanking += diagDownRightRank.fullRanking;
+void CAIPlayer::CalculateHorizontalRanking(const Block* board_block, PlayerBlock* pb, ColRanking* rank)
+{
+	const Block* b = board_block;
 
-	result.partialRanking += verticalRank.partialRanking;
-	result.partialRanking += horizontalRank.partialRanking;
-	result.partialRanking += diagUpRightRank.partialRanking;
-	result.partialRanking += diagDownRightRank.partialRanking;
+	CalculateRankingScore(b, pb->bottom, rank, LEFT, RIGHT);
+	b = b->connected[UP];
+	CalculateRankingScore(b, pb->middle, rank, LEFT, RIGHT);
+	b = b->connected[UP];
+	CalculateRankingScore(b, pb->top, rank, LEFT, RIGHT);
+	b = b->connected[UP];
+}
 
-	return result;
+void CAIPlayer::CalculateDiagDownRightRankingScore(const Block* board_block, PlayerBlock* pb, ColRanking* rank)
+{
+	const Block* b = board_block;
+
+	CalculateRankingScore(b, pb->bottom, rank, UP_LEFT, DOWN_RIGHT);
+	b = b->connected[UP];
+	CalculateRankingScore(b, pb->middle, rank, UP_LEFT, DOWN_RIGHT);
+	b = b->connected[UP];
+	CalculateRankingScore(b, pb->top, rank, UP_LEFT, DOWN_RIGHT);
+	b = b->connected[UP];
+}
+
+void CAIPlayer::CalculateDiagUpRightRankingScore(const Block* board_block, PlayerBlock* pb, ColRanking* rank)
+{
+	const Block* b = board_block;
+
+	CalculateRankingScore(b, pb->bottom, rank, UP_RIGHT, DOWN_LEFT);
+	b = b->connected[UP];
+	CalculateRankingScore(b, pb->middle, rank, UP_RIGHT, DOWN_LEFT);
+	b = b->connected[UP];
+	CalculateRankingScore(b, pb->top, rank, UP_RIGHT, DOWN_LEFT);
+	b = b->connected[UP];
+}
+
+void CAIPlayer::CalculateRankingScore(const Block* board_block, BlockType type, ColRanking* rank, int dir1, int dir2)
+{
+	unsigned short matched = 1;
+	const Block* blk = board_block->connected[dir1];
+
+	for(int i=0; i < 10; i++)
+	{
+		if ((blk == nullptr) || (blk->type != type) )
+		{
+			break;
+		}else if (blk->type == type)		
+			matched++;
+
+		blk = blk->connected[dir1];
+	}
+
+
+	blk = board_block->connected[dir2];
+	
+	for(int i=0; i < 10; i++)
+	{
+		if ((blk == nullptr) || (blk->type != type) )
+		{
+			break;
+		}else if (blk->type == type)		
+			matched++;
+
+		blk = blk->connected[dir2];
+	}
+
+	
+	matched &= BLOCKS_MATCHED_SIZE; // ensure it fits
+	rank->blocks_matched[matched] += 1;
 }

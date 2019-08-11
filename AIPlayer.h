@@ -1,13 +1,22 @@
 #pragma once
 
 #include "Block.h"
-#include "GameScene.h"
+#include "Player.h"
+
+namespace game
+{
+
+static const int BLOCKS_MATCHED_SIZE = 7;
+	
 
 struct ColRanking{
-	int column;
-	int fullRanking;
-	int partialRanking;
+	int col;
+	int blocks_matched[BLOCKS_MATCHED_SIZE+1];
+	int y;
 };
+
+bool IsBetterRanking(const ColRanking* potential, ColRanking* best_rank);
+void AssignIfBetterRanking(const ColRanking* potential, ColRanking* best_rank);
 
 class CAIPlayer: public Player{
 private:
@@ -16,7 +25,7 @@ private:
 	int _TargetRotation;
 	Player* _Player;
 
-	ColRanking InnerCalculateMove(const Board* board);
+	ColRanking CalculatePerRotation(const Board* board, PlayerBlock* pb);
 
 public:
 	bool ShouldRotate();
@@ -29,24 +38,14 @@ public:
 
 	int GetTargetRotation();
 
-	int CalculateVerticalRanking(const Block* block);
+	void CalculateVerticalRankingScore(const Block* board_block, PlayerBlock* pb, ColRanking* rank);
+	void CalculateHorizontalRanking(const Block* block, PlayerBlock* pbs, ColRanking* rank);
+	void CalculateDiagDownRightRankingScore(const Block* board_block, PlayerBlock* pb, ColRanking* rank);
+	void CalculateDiagUpRightRankingScore(const Block* board_block, PlayerBlock* pb, ColRanking* rank);
+private:
+	void CalculateRankingScore(const Block* board_block, BlockType type, ColRanking* rank, int dir1, int dir2);
 
-	ColRanking CalculateHorizontalRanking(const Block* block);
 
-	void AssignRanking(ColRanking& rank, int ranking);
-
-	int CalculateHorizontalRanking(const Block* block, BlockType& type);
-
-	ColRanking CalculateDiagUpRight(const Block* block);
-
-	int CalculateDiagUpRight(const Block* block, BlockType& type);
-
-	ColRanking CalculateDiagDownRight(const Block* block);
-
-	int CalculateDiagDownRight(const Block* block, BlockType& type);
-
-	ColRanking CalculateColumnRating(int col, const Board* board);
-
-	int Calculate(const Block* block, BlockType& type, int direction);
 };
 
+}

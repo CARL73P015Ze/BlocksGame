@@ -3,16 +3,19 @@
 
 #include <sstream>
 
+
+ 
 CGameScene::CGameScene(CRenderer* renderer, CSceneContext* context){
 		_Renderer = renderer;
 		_SceneContext = context;
 
-	initBoard(&_Board);
-
 }
 
 
-std::string CGameScene::GetName(){ return "GAME";}
+std::string CGameScene::GetName()
+{ 
+	return "GAME";
+}
 
 void CGameScene::Init()
 {
@@ -42,6 +45,8 @@ void CGameScene::OnSceneStarted(){
 	_PauseMenu->visible = false;
 	_GameOver = false;
 	_CurrentMenu = NULL;
+	mCombo = 0;
+	mBlocksToRemove = 0;
 }
 
 
@@ -174,6 +179,30 @@ void CGameScene::RenderBoard(){
 	}
 }
 
+void CGameScene::RenderCombo()
+{
+	if(mCombo > 1)
+	{
+		std::ostringstream stream;
+		stream << "Combo" << mCombo;
+		std::string str = stream.str();
+		_Renderer->RenderString(&str, 300, 200);
+	}
+}
+
+void CGameScene::RenderImpressive()
+{
+	if(mBlocksToRemove > 2)
+	{
+		std::ostringstream stream;
+		stream << "Impressive Matches" << mBlocksToRemove;
+		std::string str = stream.str();
+
+		_Renderer->RenderString(&str, 300, 300);
+	}
+}
+
+
 void CGameScene::RenderNext(){
 	const PlayerBlock& player = GetNext();
 	SDL_Rect title_dest;
@@ -215,7 +244,8 @@ void CGameScene::OnLoop(){
 		ProcessOrphaned();
 	}else{
 		old += ticks_since_last_run;
-		if(old > 500){
+		if(old > 2000)
+		{
 			RemoveMatchedBlocks();
 			old = 0;
 		}
@@ -250,6 +280,10 @@ void CGameScene::Render(){
 	outt << GetLevel();
 	str = outt.str();
 	_Renderer->RenderString(&str, 500, 270);
+
+
+	RenderCombo();
+	RenderImpressive();
 
 	if(_PauseMenu->visible)
 		_PauseMenu->Render(_Renderer);
@@ -298,60 +332,6 @@ void CGameScene::RenderPlayer(){
 
 
 
-void CGameScene::initBoard(Board* board)
-{
-	for(int row=BOARD_HEIGHT-1; row >=0; row--){
-		for(int i=0; i< BOARD_WIDTH; i++){
-			Block* current = &board->blocks[i+((row)*BOARD_WIDTH)];
-
-			current->remove = false;
-			current->type = EMPTY;
-
-			if(i < BOARD_WIDTH-1)
-				current->connected[RIGHT] = &board->blocks[i+1+(row*BOARD_WIDTH)];
-			else
-				current->connected[RIGHT] = NULL;
-
-			if(i > 0)
-				current->connected[LEFT] = &board->blocks[i-1+(row*BOARD_WIDTH)];
-			else
-				current->connected[LEFT] = NULL;
-
-			if(row < BOARD_HEIGHT-1)
-				current->connected[DOWN] = &board->blocks[i+((row+1)*BOARD_WIDTH)];
-			else
-				current->connected[DOWN] = NULL;
-
-			if(i < BOARD_WIDTH-1 && row < BOARD_HEIGHT-1){
-				current->connected[DOWN_RIGHT] = &board->blocks[i+1+((row+1)*BOARD_WIDTH)];
-			}else
-				current->connected[DOWN_RIGHT] = NULL;
-
-			if(i < BOARD_WIDTH-1 && row < BOARD_HEIGHT-1){
-				current->connected[DOWN_LEFT] = &board->blocks[i-1+((row+1)*BOARD_WIDTH)];
-			}else
-				current->connected[DOWN_LEFT] = NULL;
-
-			if(i < BOARD_WIDTH-1 && row > 0){
-				current->connected[UP_RIGHT] = &board->blocks[i+1+((row-1)*BOARD_WIDTH)];
-			}else
-				current->connected[UP_RIGHT] = NULL;
-
-			if(i > 0 && row > 0){
-				current->connected[UP_LEFT] = &board->blocks[i-1+((row-1)*BOARD_WIDTH)];
-			}else
-				current->connected[UP_LEFT] = NULL;
-
-			if(i > 0 && row > 0){
-				current->connected[UP] = &board->blocks[i+((row-1)*BOARD_WIDTH)];
-			}else
-				current->connected[UP] = NULL;
-
-		}
-
-
-	}
-}
 
 
 
@@ -405,6 +385,8 @@ bool CGameScene::find_matches(Block* block, int side){
 	if(result){
 		next = block;
 		do{
+			if(!next->remove)
+				mBlocksToRemove++;
 			next->remove= true;
 			next = next->connected[side];
 		}while(--matches > 0);
@@ -495,7 +477,7 @@ void CGameScene::MoveLeft(){
 			_Player._X--;
 	}else if(_Player._X == 1){
 		_Player._X--;
-	}
+}
 }
 
 void CGameScene::MoveRight(){
@@ -507,7 +489,7 @@ void CGameScene::MoveRight(){
 			_Player._X++;
 	}else if (_Player.getX() == 6){
 		_Player._X++;
-	}
+}
 }
 
 void CGameScene::MainLoop(long ticks_since_last_run){
@@ -560,6 +542,9 @@ void CGameScene::MainLoop(long ticks_since_last_run){
 
 		if(added == 1){
 			_FoundMatch = FindMatches() > 0;
+			
+			if(_FoundMatch)
+				mCombo += 1;
 		}else{
 			_GameOver = true;
 		}
@@ -630,6 +615,15 @@ void CGameScene::ProcessOrphaned(){
 
 	if(_HasOrphaned != hadOrphanedBefore){
 		_FoundMatch = FindMatches() > 0;
+		if(_FoundMatch)
+		{
+			mCombo += 1;
+		}
+		else
+		{
+			mCombo = 0;
+			mBlocksToRemove = 0;
+		}
 	}
 }
 

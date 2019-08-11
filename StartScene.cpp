@@ -47,7 +47,6 @@ void CStartScene::OnSceneStarted(){
 }
 
 void CStartScene::OnStartEvent(){
-//	_Dispatcher->Dispatch(E_SCENE_GAME);
 	_SceneContext->SetActiveScene(E_SCENE_GAME);
 }
 
@@ -105,7 +104,7 @@ void CStartScene::HandleUserInput(const ExternalEvent& e){
 void CStartScene::OnLoop(){
 	long now = SDL_GetTicks();
 	if(now - _SceneStartedAt > 5000){
-//		_SceneContext->SetActiveScene(E_SCENE_DEMO);
+		_SceneContext->SetActiveScene(E_SCENE_DEMO);
 	}
 }
 

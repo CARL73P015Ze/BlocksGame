@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "GameAIScene.h"
 
-
+using namespace game;
 
 CGameAIScene::CGameAIScene(CRenderer* renderer, CSceneContext* context) 
 								: CGameScene(renderer, context){
@@ -14,6 +14,28 @@ void CGameAIScene::HandleUserInput(const ExternalEvent& e){
 	// consume events
 	if(e == E_DPAD_START_PRESS || e == E_PRIMARY_BUTTON_DOWN){
 		_SceneContext->SetActiveScene(E_SCENE_START);
+	}else
+	{
+		if(e == E_DUMP_STATE) {
+			printf("PLAYER: \n");
+			printf("%i\n%i\n%i\n", 
+						this->GetPlayer()->Blocks.top,
+						this->GetPlayer()->Blocks.middle,
+						this->GetPlayer()->Blocks.bottom
+						);
+
+			const Block *block;
+			for(int y=0; y< BOARD_HEIGHT; y++){
+				for(int x = 0; x < BOARD_WIDTH-1; x++){
+					block = &_Board.blocks[x+(BOARD_WIDTH*y)];
+
+					printf("%i", block->type);
+				}
+				printf("\n");
+			}
+			
+
+		}
 	}
 }
 

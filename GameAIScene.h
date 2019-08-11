@@ -2,6 +2,9 @@
 #include "gamescene.h"
 #include "AIPlayer.h"
 
+namespace game
+{
+
 class CGameAIScene : public CGameScene{
 private:
 	CAIPlayer* _AiPlayer;
@@ -18,3 +21,5 @@ public:
 	void OnLoop();
 
 };
+
+}

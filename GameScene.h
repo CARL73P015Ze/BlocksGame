@@ -4,17 +4,11 @@
 #include "Player.h"
 #include "EventDispatcher.h"
 
-const int BOARD_WIDTH = 7;
-const int BOARD_HEIGHT = 11;
 
-const int BOARD_SIZE = BOARD_WIDTH * BOARD_HEIGHT;
-
-struct Board{
-	Block blocks[BOARD_WIDTH*BOARD_HEIGHT];
-};
 
 const int GAME_ON_RESUME_EVENT=1;
 const int GAME_ON_QUIT_EVENT=2;
+
 
 
 class CGameScene : public CScene
@@ -28,6 +22,8 @@ private:
 	CMenu *_CurrentMenu;
 	Uint32 old;
 	Uint32 last;
+	int mCombo;
+	int mBlocksToRemove;
 protected:
 	CSceneContext* _SceneContext;
 public:
@@ -43,7 +39,6 @@ public:
 	void OnLoop();
 	void Render();
 
-	void initBoard(Board* board);
 
 protected:
 	int _Score;
@@ -63,6 +58,9 @@ protected:
 
 private:
 	int CalculateScoreForMatches(int matches);
+
+	void RenderCombo();
+	void RenderImpressive();
 public:
 	Board _Board;
 	bool IsPlayerAvailable();

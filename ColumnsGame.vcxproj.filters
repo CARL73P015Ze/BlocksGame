@@ -19,9 +19,6 @@
     <Filter Include="Scenes">
       <UniqueIdentifier>{f0c2e563-2ba6-466e-9040-cba469a8cc7d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Scenes\Gameover">
-      <UniqueIdentifier>{e273191d-e010-4d20-9cc8-259b6160145a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Scenes\Game">
       <UniqueIdentifier>{417a700b-8fcf-41f3-b069-2d68c46e82ba}</UniqueIdentifier>
     </Filter>

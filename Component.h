@@ -34,7 +34,8 @@ enum ExternalEvent
   E_DPAD_DOWN_PRESS,
   E_DPAD_LEFT_PRESS,
   E_DPAD_RIGHT_PRESS,
-  E_DPAD_START_PRESS
+  E_DPAD_START_PRESS,
+  E_DUMP_STATE
 };
 
 class CUserControl{

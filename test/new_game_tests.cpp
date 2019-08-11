@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include <igloo/igloo_alt.h>
 #include "Game.h"
 #include <string>

@@ -24,6 +24,8 @@
 #include "GameAIScene.h"
 #include "GameShutdown.h"
 
+using namespace game;
+
 int main2();
 
 int _tmain(int argc, _TCHAR* argv[]){
@@ -147,6 +149,7 @@ int main2(  )
 
           if (e.type == SDL_KEYDOWN){
 			  switch(e.key.keysym.scancode){
+			    case SDL_SCANCODE_F1: current->HandleUserInput(E_DUMP_STATE); break;
 			    case SDL_SCANCODE_SPACE: current->HandleUserInput(E_PRIMARY_BUTTON_DOWN); break;
 				case SDL_SCANCODE_RIGHT: current->HandleUserInput(E_DPAD_RIGHT_PRESS); break;
 				case SDL_SCANCODE_LEFT: current->HandleUserInput(E_DPAD_LEFT_PRESS); break;
